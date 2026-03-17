@@ -161,6 +161,4 @@ jobs:
             ${{ steps.package.outputs.artifact_dir }}/gaokun3_defconfig
             ${{ steps.package.outputs.artifact_dir }}/release-info.txt
             ${{ steps.package.outputs.artifact_dir }}/SHA256SUMS.txt
-            ${{ steps.package.outputs.artifact_dir }}/grub.cfg
-            ${{ steps.package.outputs.artifact_dir }}/efi-bridge-grub.cfg
             ${{ steps.package.outputs.artifact_dir }}/*.zst.part-*
