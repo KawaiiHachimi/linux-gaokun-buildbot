@@ -150,7 +150,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fedora-gaokun3-build
-          path: ${{ steps.package.outputs.artifact_dir }}/*
+          path: |
+            ${{ steps.package.outputs.artifact_dir }}/gaokun3_defconfig
+            ${{ steps.package.outputs.artifact_dir }}/release-info.txt
+            ${{ steps.package.outputs.artifact_dir }}/SHA256SUMS.txt
+            ${{ steps.package.outputs.artifact_dir }}/*.zst.part-*
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

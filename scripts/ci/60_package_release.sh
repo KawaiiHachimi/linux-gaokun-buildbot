@@ -15,7 +15,11 @@ zstd -T0 -19 "$ARTIFACT_DIR/$(basename "$IMAGE_FILE")" -o "$ARTIFACT_DIR/$(basen
 split -b "$IMAGE_CHUNK_SIZE" -d -a 3 \
   "$ARTIFACT_DIR/$(basename "$IMAGE_FILE").zst" \
   "$ARTIFACT_DIR/$(basename "$IMAGE_FILE").zst.part-"
-sudo sha256sum "$ARTIFACT_DIR"/* | sudo tee "$ARTIFACT_DIR/SHA256SUMS.txt" > /dev/null
+
+sudo sha256sum \
+  "$ARTIFACT_DIR/gaokun3_defconfig" \
+  "$ARTIFACT_DIR/$(basename "$IMAGE_FILE").zst.part-"* \
+  | sudo tee "$ARTIFACT_DIR/SHA256SUMS.txt" > /dev/null
 sudo chown "$(id -u):$(id -g)" "$ARTIFACT_DIR/SHA256SUMS.txt"
 
 cat > "$ARTIFACT_DIR/release-info.txt" <<EOF

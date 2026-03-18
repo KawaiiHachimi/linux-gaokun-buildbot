@@ -103,8 +103,6 @@ grep -n "devicetree" /boot/grub2/grub.cfg
 CHROOT_EOF
 
 sync
-sudo cp "$MNT/boot/grub2/grub.cfg" "$ARTIFACT_DIR/grub.cfg"
-sudo cp "$MNT/boot/efi/EFI/BOOT/grub.cfg" "$ARTIFACT_DIR/efi-bridge-grub.cfg"
 
 trap - EXIT
 cleanup
