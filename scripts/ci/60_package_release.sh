@@ -12,7 +12,6 @@ KREL="$(cat "$WORKDIR/kernel-release.txt")"
 IMAGE_BASENAME="$(basename "$IMAGE_FILE")"
 ZST_FILE="$ARTIFACT_DIR/${IMAGE_BASENAME}.zst"
 RELEASE_BODY_FILE="$ARTIFACT_DIR/release-body.md"
-SHA256_FILE="$ARTIFACT_DIR/SHA256SUMS.txt"
 SPLIT_THRESHOLD_BYTES=$((2 * 1024 * 1024 * 1024))
 
 cp "$IMAGE_FILE" "$ARTIFACT_DIR/"
@@ -20,16 +19,10 @@ zstd -T0 -19 "$ARTIFACT_DIR/$IMAGE_BASENAME" -o "$ZST_FILE"
 
 if [ "$(stat -c '%s' "$ZST_FILE")" -lt "$SPLIT_THRESHOLD_BYTES" ]; then
   PACKAGE_GLOB="${IMAGE_BASENAME}.zst"
-  (
-    cd "$ARTIFACT_DIR"
-    sudo sha256sum \
-      "gaokun3_defconfig" \
-      | sudo tee "$SHA256_FILE" > /dev/null
-  )
   cat > "$RELEASE_BODY_FILE" <<EOF
 ## Build Information
 
-- Distribution: Fedora ${FEDORA_RELEASE} (Minimal GNOME)
+- Distribution: Fedora Linux ${FEDORA_RELEASE} (Minimal GNOME)
 - Kernel Tag: ${KERNEL_TAG}
 - Kernel Release: ${KREL}
 - Architecture: arm64
@@ -43,24 +36,12 @@ if [ "$(stat -c '%s' "$ZST_FILE")" -lt "$SPLIT_THRESHOLD_BYTES" ]; then
 
 - Username: user
 - Password: user
-
-## SHA256
-
-```text
-$(cat "$SHA256_FILE")
-```
 EOF
 else
   split -b "$IMAGE_CHUNK_SIZE" -d -a 3 \
     "$ZST_FILE" \
     "$ZST_FILE.part-"
   PACKAGE_GLOB="${IMAGE_BASENAME}.zst.part-*"
-  (
-    cd "$ARTIFACT_DIR"
-    sudo sha256sum \
-      "${IMAGE_BASENAME}.zst.part-"* \
-      | sudo tee "$SHA256_FILE" > /dev/null
-  )
   cat > "$RELEASE_BODY_FILE" <<EOF
 ## Build Information
 
@@ -85,16 +66,10 @@ else
 cat ${IMAGE_BASENAME}.zst.part-* > ${IMAGE_BASENAME}.zst
 zstd -d ${IMAGE_BASENAME}.zst -o ${IMAGE_BASENAME}
 ```
-
-## SHA256
-
-```text
-$(cat "$SHA256_FILE")
-```
 EOF
 fi
 
-sudo chown "$(id -u):$(id -g)" "$SHA256_FILE" "$RELEASE_BODY_FILE"
+sudo chown "$(id -u):$(id -g)" "$RELEASE_BODY_FILE"
 
 TAG_NAME="fedora${FEDORA_RELEASE}-${KREL}-$(date -u +%Y%m%d%H%M%S)"
 

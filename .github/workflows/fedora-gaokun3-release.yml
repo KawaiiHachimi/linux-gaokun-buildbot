@@ -145,7 +145,7 @@ jobs:
         uses: softprops/action-gh-release@v2.6.1
         with:
           tag_name: ${{ steps.package.outputs.tag_name }}
-          name: Fedora ${{ env.FEDORA_RELEASE }} - gaokun3 - ${{ steps.package.outputs.kernel_release }}
+          name: Fedora Linux ${{ env.FEDORA_RELEASE }} - gaokun3 - ${{ steps.package.outputs.kernel_release }}
           body_path: ${{ steps.package.outputs.artifact_dir }}/${{ steps.package.outputs.release_body_file }}
           files: |
             ${{ steps.package.outputs.artifact_dir }}/gaokun3_defconfig
