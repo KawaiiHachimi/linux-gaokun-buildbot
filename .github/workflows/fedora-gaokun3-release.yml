@@ -106,7 +106,7 @@ jobs:
             --repofrompath=updates,https://dl.fedoraproject.org/pub/fedora/linux/updates/${FEDORA_RELEASE}/Everything/aarch64/ \
             --exclude=gnome-boxes,gnome-connections,gnome-browser-connector,snapshot,gnome-weather,showtime,decibels,gnome-contacts,gnome-maps,simple-scan,gnome-clocks,yelp,gnome-user-docs,gnome-calculator,gnome-calendar \
             install \
-            @gnome-desktop \
+            @gnome-desktop fedora-release-common fedora-repos \
             passwd dnf sudo udev \
             bluez dracut dracut-network btrfs-progs \
             grub2-efi-aa64 grub2-efi-aa64-modules efibootmgr shim-aa64 \
