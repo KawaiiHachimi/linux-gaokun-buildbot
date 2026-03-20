@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SRC_MONITORS="/home/user/.config/monitors.xml"
+GDM_DIR="/var/lib/gdm/seat0/config"
+DST_MONITORS="$GDM_DIR/monitors.xml"
+SENTINEL="/var/lib/gdm/.gaokun-monitors-synced"
+
+[[ -f "$SRC_MONITORS" ]] || exit 0
+[[ ! -e "$SENTINEL" ]] || exit 0
+
+for _ in $(seq 1 120); do
+  if [[ -d "$GDM_DIR" ]]; then
+    cp "$SRC_MONITORS" "$DST_MONITORS"
+    chown --reference="$GDM_DIR" "$DST_MONITORS"
+    touch "$SENTINEL"
+    systemctl disable gdm-monitor-sync.service || true
+    systemctl try-restart gdm.service || true
+    exit 0
+  fi
+  sleep 0.5
+done
+
+exit 0

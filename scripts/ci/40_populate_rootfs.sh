@@ -37,6 +37,14 @@ sudo mkdir -p \
 sudo cp "$GAOKUN_DIR/tools/touchpad/huawei-tp-activate.py" "$ROOTFS_DIR/usr/local/bin/"
 sudo cp "$GAOKUN_DIR/tools/touchpad/huawei-touchpad.service" "$ROOTFS_DIR/etc/systemd/system/"
 sudo chmod +x "$ROOTFS_DIR/usr/local/bin/huawei-tp-activate.py"
+sudo cp "$GAOKUN_DIR/tools/touchscreen/hx83121a-touch-recovery" "$ROOTFS_DIR/usr/local/bin/"
+sudo cp "$GAOKUN_DIR/tools/touchscreen/hx83121a-touch-recovery.service" \
+  "$ROOTFS_DIR/etc/systemd/system/"
+sudo chmod +x "$ROOTFS_DIR/usr/local/bin/hx83121a-touch-recovery"
+sudo cp "$GAOKUN_DIR/tools/monitors/gdm-monitor-sync" "$ROOTFS_DIR/usr/local/bin/"
+sudo cp "$GAOKUN_DIR/tools/monitors/gdm-monitor-sync.service" \
+  "$ROOTFS_DIR/etc/systemd/system/"
+sudo chmod +x "$ROOTFS_DIR/usr/local/bin/gdm-monitor-sync"
 sudo cp "$GAOKUN_DIR/tools/bluetooth/patch-nvm-bdaddr.py" "$ROOTFS_DIR/usr/local/bin/"
 sudo chmod +x "$ROOTFS_DIR/usr/local/bin/patch-nvm-bdaddr.py"
 sudo cp "$GAOKUN_DIR/tools/audio/sc8280xp.conf" \

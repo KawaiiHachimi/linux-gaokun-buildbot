@@ -159,6 +159,18 @@ sudo cp $GAOKUN_DIR/tools/touchpad/huawei-touchpad.service \
     $ROOTFS_DIR/etc/systemd/system/
 sudo chmod +x $ROOTFS_DIR/usr/local/bin/huawei-tp-activate.py
 
+sudo cp $GAOKUN_DIR/tools/touchscreen/hx83121a-touch-recovery \
+    $ROOTFS_DIR/usr/local/bin/
+sudo cp $GAOKUN_DIR/tools/touchscreen/hx83121a-touch-recovery.service \
+    $ROOTFS_DIR/etc/systemd/system/
+sudo chmod +x $ROOTFS_DIR/usr/local/bin/hx83121a-touch-recovery
+
+sudo cp $GAOKUN_DIR/tools/monitors/gdm-monitor-sync \
+    $ROOTFS_DIR/usr/local/bin/
+sudo cp $GAOKUN_DIR/tools/monitors/gdm-monitor-sync.service \
+    $ROOTFS_DIR/etc/systemd/system/
+sudo chmod +x $ROOTFS_DIR/usr/local/bin/gdm-monitor-sync
+
 sudo cp $GAOKUN_DIR/tools/bluetooth/patch-nvm-bdaddr.py \
     $ROOTFS_DIR/usr/local/bin/
 sudo chmod +x $ROOTFS_DIR/usr/local/bin/patch-nvm-bdaddr.py
@@ -298,13 +310,9 @@ cat > /home/user/.config/monitors.xml <<EOF
 EOF
 chown user:user /home/user/.config/monitors.xml
 
-GDM_DIR="/var/lib/gdm/seat0/config"
-mkdir -p "$GDM_DIR"
-cp /home/user/.config/monitors.xml "$GDM_DIR/monitors.xml"
-chown --reference="$GDM_DIR" "$GDM_DIR/monitors.xml"
-
-# 开启图形、网络、SSH 和触控板服务
-systemctl enable gdm NetworkManager sshd huawei-touchpad.service
+# 开启图形、网络、SSH、触控板、触摸屏恢复和首启显示同步服务
+systemctl enable gdm NetworkManager sshd huawei-touchpad.service \
+    hx83121a-touch-recovery.service gdm-monitor-sync.service
 
 # 运行时与 dracut 都需要的关键模块
 mkdir -p /etc/modules-load.d

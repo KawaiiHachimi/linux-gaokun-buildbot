@@ -1,0 +1,15 @@
+[Unit]
+Description=Sync user monitors.xml to GDM on first boot
+After=gdm.service
+Wants=gdm.service
+ConditionPathExists=/home/user/.config/monitors.xml
+ConditionPathExists=!/var/lib/gdm/.gaokun-monitors-synced
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/gdm-monitor-sync
+RemainAfterExit=yes
+TimeoutStartSec=70
+
+[Install]
+WantedBy=graphical.target
