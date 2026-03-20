@@ -18,7 +18,7 @@ on:
       excluded_packages:
         description: Packages to exclude from rootfs install (comma-separated)
         required: true
-        default: "gnome-boxes,gnome-connections,gnome-browser-connector,snapshot,gnome-weather,gnome-contacts,gnome-maps,simple-scan,gnome-clocks,yelp,gnome-user-docs,gnome-calculator,gnome-calendar"
+        default: "gnome-boxes,gnome-connections,gnome-browser-connector,snapshot,gnome-weather,gnome-contacts,gnome-maps,simple-scan,gnome-clocks,gnome-calculator,gnome-calendar"
       extra_packages:
         description: Extra packages to install (space-separated)
         required: true
