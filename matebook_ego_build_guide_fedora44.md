@@ -14,6 +14,8 @@
 本文使用项目内已有内容，不需要额外获取设备专属仓库：
 
 - `gaokun-patches/`
+- `defconfig/`
+- `dts/`
 - `tools/`
 - `firmware/`
 
@@ -61,17 +63,36 @@ export IMAGE_FILE=$WORKDIR/fedora-44-gaokun3.img
 
 ## 第二步：编译内核
 
-应用项目内核补丁并构建：
+应用项目内核补丁，并导入仓库内的 DTS 与 defconfig 后构建：
 
 ```bash
 cd $KERN_SRC
 
-# 应用项目内置补丁，包含 gaokun3 所需的 DTS、驱动和 defconfig 修改
+# 应用项目内置补丁
 git am $GAOKUN_DIR/gaokun-patches/*.patch
+
+# 覆盖内核源码中的 defconfig，并拷入项目维护的 DTS 文件
+install -Dm644 \
+    $GAOKUN_DIR/defconfig/gaokun_defconfig \
+    $KERN_SRC/arch/arm64/configs/defconfig
+install -Dm644 \
+    $GAOKUN_DIR/dts/sc8280xp-huawei-gaokun3.dts \
+    $KERN_SRC/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dts
+install -Dm644 \
+    $GAOKUN_DIR/dts/sc8280xp-huawei-gaokun3-camera.dtsi \
+    $KERN_SRC/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3-camera.dtsi
+
+# 临时提交，避免内核版本字符串附带 -dirty
+git add \
+    arch/arm64/configs/defconfig \
+    arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dts \
+    arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3-camera.dtsi
+git diff --cached --quiet || \
+    git commit -m "arm64: gaokun3: import local dts and defconfig"
 
 mkdir -p $KERN_OUT
 
-# 先根据补丁后的 defconfig 生成配置，再补齐默认选项
+# 先根据覆盖后的 defconfig 生成配置，再补齐新内核默认选项
 make O=$KERN_OUT ARCH=arm64 defconfig
 make O=$KERN_OUT ARCH=arm64 olddefconfig
 make O=$KERN_OUT ARCH=arm64 -j$(nproc)

@@ -24,6 +24,25 @@ git -C "$KERN_SRC" config user.email "github-actions[bot]@users.noreply.github.c
 
 git -C "$KERN_SRC" am "$GAOKUN_DIR"/gaokun-patches/*.patch
 
+install -Dm644 \
+  "$GAOKUN_DIR/defconfig/gaokun_defconfig" \
+  "$KERN_SRC/arch/arm64/configs/defconfig"
+install -Dm644 \
+  "$GAOKUN_DIR/dts/sc8280xp-huawei-gaokun3.dts" \
+  "$KERN_SRC/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dts"
+install -Dm644 \
+  "$GAOKUN_DIR/dts/sc8280xp-huawei-gaokun3-camera.dtsi" \
+  "$KERN_SRC/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3-camera.dtsi"
+
+git -C "$KERN_SRC" add \
+  arch/arm64/configs/defconfig \
+  arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dts \
+  arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3-camera.dtsi
+
+if ! git -C "$KERN_SRC" diff --cached --quiet; then
+  git -C "$KERN_SRC" commit -m "arm64: gaokun3: import local dts and defconfig"
+fi
+
 unset KCONFIG_CONFIG
 make -C "$KERN_SRC" O="$KERN_OUT" ARCH=arm64 CROSS_COMPILE="$CROSS_COMPILE" defconfig
 make -C "$KERN_SRC" O="$KERN_OUT" ARCH=arm64 CROSS_COMPILE="$CROSS_COMPILE" olddefconfig
@@ -31,6 +50,3 @@ make -C "$KERN_SRC" O="$KERN_OUT" ARCH=arm64 CROSS_COMPILE="$CROSS_COMPILE" -j"$
 
 KREL="$(cat "$KERN_OUT/include/config/kernel.release")"
 echo "$KREL" > "$WORKDIR/kernel-release.txt"
-
-make -C "$KERN_SRC" O="$KERN_OUT" ARCH=arm64 CROSS_COMPILE="$CROSS_COMPILE" savedefconfig
-cp "$KERN_OUT/defconfig" "$ARTIFACT_DIR/gaokun3_defconfig"

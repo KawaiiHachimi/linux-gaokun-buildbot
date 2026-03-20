@@ -59,7 +59,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.ccache
-          key: gaokun3-ccache-${{ env.KERNEL_TAG }}-${{ hashFiles('gaokun-patches/*.patch', 'scripts/ci/20_build_kernel.sh') }}
+          key: gaokun3-ccache-${{ env.KERNEL_TAG }}-${{ hashFiles('gaokun-patches/*.patch', 'defconfig/**', 'dts/**', 'scripts/ci/20_build_kernel.sh') }}
           restore-keys: |
             gaokun3-ccache-${{ env.KERNEL_TAG }}-
             gaokun3-ccache-
@@ -125,7 +125,6 @@ jobs:
         with:
           name: fedora-gaokun3-build
           path: |
-            ${{ steps.package.outputs.artifact_dir }}/gaokun3_defconfig
             ${{ steps.package.outputs.artifact_dir }}/${{ steps.package.outputs.package_glob }}
 
       - name: Create GitHub Release
@@ -135,5 +134,4 @@ jobs:
           name: Fedora Linux ${{ env.FEDORA_RELEASE }} - gaokun3 - ${{ steps.package.outputs.kernel_release }}
           body_path: ${{ steps.package.outputs.artifact_dir }}/${{ steps.package.outputs.release_body_file }}
           files: |
-            ${{ steps.package.outputs.artifact_dir }}/gaokun3_defconfig
             ${{ steps.package.outputs.artifact_dir }}/${{ steps.package.outputs.package_glob }}

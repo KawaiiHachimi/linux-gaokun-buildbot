@@ -26,7 +26,7 @@ if [ "$(stat -c '%s' "$ZST_FILE")" -lt "$SPLIT_THRESHOLD_BYTES" ]; then
 - Kernel Tag: ${KERNEL_TAG}
 - Kernel Release: ${KREL}
 - Architecture: arm64
-- Root Filesystem: Btrfs (@, @home)
+- Root Filesystem: Btrfs (@, @home, @var)
 - Bootloader: GRUB2 (BLS disabled, traditional grub.cfg)
 - Image File: ${IMAGE_BASENAME}
 - Compressed File: ${IMAGE_BASENAME}.zst
@@ -49,7 +49,7 @@ else
 - Kernel Tag: ${KERNEL_TAG}
 - Kernel Release: ${KREL}
 - Architecture: arm64
-- Root Filesystem: Btrfs (@, @home)
+- Root Filesystem: Btrfs (@, @home, @var)
 - Bootloader: GRUB2 (BLS disabled, traditional grub.cfg)
 - Image File: ${IMAGE_BASENAME}
 - Compressed File: ${IMAGE_BASENAME}.zst
