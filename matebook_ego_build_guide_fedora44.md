@@ -174,16 +174,19 @@ ROOT_UUID=$(sudo blkid -s UUID -o value ${LOOP}p2)
 ```bash
 sudo mkdir -p /mnt/ego-fedora
 
-# 创建 Fedora 常见子卷布局：@ 用于根分区，@home 用于家目录
+# 创建 Fedora 常见子卷布局：@ 用于根分区，@home 用于家目录，@var 用于 /var
 sudo mount ${LOOP}p2 /mnt/ego-fedora
 sudo btrfs subvolume create /mnt/ego-fedora/@
 sudo btrfs subvolume create /mnt/ego-fedora/@home
+sudo btrfs subvolume create /mnt/ego-fedora/@var
 sudo umount /mnt/ego-fedora
 
 # 挂载子卷并准备 EFI 分区
 sudo mount -o subvol=@ ${LOOP}p2 /mnt/ego-fedora
 sudo mkdir -p /mnt/ego-fedora/home
 sudo mount -o subvol=@home ${LOOP}p2 /mnt/ego-fedora/home
+sudo mkdir -p /mnt/ego-fedora/var
+sudo mount -o subvol=@var ${LOOP}p2 /mnt/ego-fedora/var
 sudo mkdir -p /mnt/ego-fedora/boot/efi
 sudo mount ${LOOP}p1 /mnt/ego-fedora/boot/efi
 
@@ -192,6 +195,7 @@ sudo rsync -aHAX --info=progress2 $ROOTFS_DIR/ /mnt/ego-fedora/
 sudo tee /mnt/ego-fedora/etc/fstab > /dev/null <<EOF
 UUID=${ROOT_UUID}  /         btrfs  subvol=@,compress=zstd:1,ssd,noatime  0  0
 UUID=${ROOT_UUID}  /home     btrfs  subvol=@home,compress=zstd:1,ssd,noatime  0  0
+UUID=${ROOT_UUID}  /var      btrfs  subvol=@var,compress=zstd:1,ssd,noatime  0  0
 UUID=${EFI_UUID}   /boot/efi vfat   defaults,nofail,x-systemd.device-timeout=10s  0  2
 EOF
 ```
@@ -203,6 +207,7 @@ EOF
 cleanup_mounts() {
     sudo umount /mnt/ego-fedora/dev/pts 2>/dev/null || true
     sudo umount /mnt/ego-fedora/boot/efi 2>/dev/null || true
+    sudo umount /mnt/ego-fedora/var 2>/dev/null || true
     sudo umount /mnt/ego-fedora/home 2>/dev/null || true
     sudo umount /mnt/ego-fedora/dev 2>/dev/null || true
     sudo umount /mnt/ego-fedora/proc 2>/dev/null || true
