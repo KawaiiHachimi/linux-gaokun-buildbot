@@ -63,7 +63,8 @@ export IMAGE_FILE=$WORKDIR/fedora-44-gaokun3.img
 
 ## 第二步：编译内核
 
-应用项目内核补丁，并导入仓库内的 DTS 与 defconfig 后构建：
+应用项目内核补丁，并导入仓库内的 DTS 与 defconfig 后构建。
+当前触摸屏方案已经统一为内核内的 Himax HX83121A SPI 驱动，不再额外安装 DKMS，也不再依赖旧的 I2C 恢复脚本：
 
 ```bash
 cd $KERN_SRC
@@ -175,12 +176,6 @@ sudo cp $GAOKUN_DIR/tools/touchpad/huawei-tp-activate.py \
 sudo cp $GAOKUN_DIR/tools/touchpad/huawei-touchpad.service \
     $ROOTFS_DIR/etc/systemd/system/
 sudo chmod +x $ROOTFS_DIR/usr/local/bin/huawei-tp-activate.py
-
-sudo cp $GAOKUN_DIR/tools/touchscreen/hx83121a-touch-recovery \
-    $ROOTFS_DIR/usr/local/bin/
-sudo cp $GAOKUN_DIR/tools/touchscreen/hx83121a-touch-recovery.service \
-    $ROOTFS_DIR/etc/systemd/system/
-sudo chmod +x $ROOTFS_DIR/usr/local/bin/hx83121a-touch-recovery
 
 sudo cp $GAOKUN_DIR/tools/monitors/gdm-monitor-sync \
     $ROOTFS_DIR/usr/local/bin/
@@ -338,15 +333,15 @@ cat > /home/user/.config/monitors.xml <<EOF
 EOF
 chown user:user /home/user/.config/monitors.xml
 
-# 开启图形、网络、SSH、触控板、触摸屏恢复和首启显示同步服务
+# 开启图形、网络、SSH、触控板和首启显示同步服务
 systemctl enable gdm NetworkManager sshd huawei-touchpad.service \
-    hx83121a-touch-recovery.service gdm-monitor-sync.service
+    gdm-monitor-sync.service
 
 # 运行时与 dracut 都需要的关键模块
 mkdir -p /etc/modules-load.d
 echo -e "pci-pwrctrl-pwrseq\nath11k_pci" > /etc/modules-load.d/wifi.conf
 echo "btqca" > /etc/modules-load.d/bluetooth.conf
-echo -e "panel-himax-hx83121a\nmsm\nhid_multitouch" > /etc/modules-load.d/display.conf
+echo -e "panel-himax-hx83121a\nhimax_hx83121a_spi\nmsm\nhid_multitouch" > /etc/modules-load.d/display.conf
 echo -e "lpasscc_sc8280xp\nsnd-soc-sc8280xp" > /etc/modules-load.d/audio.conf
 echo -e "huawei-gaokun-ec\nhuawei-gaokun-battery\nucsi_huawei_gaokun" > /etc/modules-load.d/battery.conf
 
@@ -356,7 +351,7 @@ echo "softdep pinctrl_sc8280xp_lpass_lpi pre: lpasscc_sc8280xp" > /etc/modprobe.
 # Fedora 默认使用 dracut 生成 initramfs
 cat > /etc/dracut.conf.d/matebook.conf <<MODEOF
 hostonly="no"
-add_drivers+=" btrfs nvme phy-qcom-qmp-pcie phy-qcom-qmp-combo phy-qcom-qmp-usb phy-qcom-snps-femto-v2 usb-storage uas typec pci-pwrctrl-pwrseq ath11k ath11k_pci panel-himax-hx83121a msm i2c-hid-of lpasscc_sc8280xp snd-soc-sc8280xp pinctrl_sc8280xp_lpass_lpi "
+add_drivers+=" btrfs nvme phy-qcom-qmp-pcie phy-qcom-qmp-combo phy-qcom-qmp-usb phy-qcom-snps-femto-v2 usb-storage uas typec pci-pwrctrl-pwrseq ath11k ath11k_pci panel-himax-hx83121a himax_hx83121a_spi msm i2c-hid-of lpasscc_sc8280xp snd-soc-sc8280xp pinctrl_sc8280xp_lpass_lpi "
 MODEOF
 
 dracut --force --kver $KREL
@@ -435,6 +430,7 @@ sudo dd if=$IMAGE_FILE of=/dev/sdX bs=4M status=progress conv=fsync
 
 ## 额外说明
 
+- 编译完成后可用 `grep CONFIG_TOUCHSCREEN_HIMAX_HX83121A_SPI $KERN_OUT/.config` 确认 SPI 触摸驱动已进入当前内核配置
 - 首次启动后如需扩容，可使用 `gnome-disks`，或执行 `btrfs filesystem resize max /`
 - 文中所有 `tools/` 与 firmware 都来自当前仓库，不依赖外部设备专属仓库
 - 如果你需要自动化构建，可直接参考 GitHub Actions workflow：`.github/workflows/fedora-gaokun3-release.yml`
