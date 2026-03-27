@@ -22,7 +22,7 @@ export PATH="/usr/lib/ccache:$PATH"
 git -C "$KERN_SRC" config user.name "github-actions[bot]"
 git -C "$KERN_SRC" config user.email "github-actions[bot]@users.noreply.github.com"
 
-git -C "$KERN_SRC" am "$GAOKUN_DIR"/gaokun-patches/*.patch
+git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/*.patch
 
 install -Dm644 \
   "$GAOKUN_DIR/defconfig/gaokun_defconfig" \

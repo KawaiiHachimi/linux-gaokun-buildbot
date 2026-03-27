@@ -74,7 +74,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.ccache
-          key: gaokun3-ccache-${{ env.KERNEL_TAG }}-${{ hashFiles('gaokun-patches/*.patch', 'defconfig/**', 'dts/**', 'scripts/ci/20_build_kernel.sh') }}
+          key: gaokun3-ccache-${{ env.KERNEL_TAG }}-${{ hashFiles('patches/*.patch', 'defconfig/**', 'dts/**', 'scripts/ci/20_build_kernel.sh') }}
           restore-keys: |
             gaokun3-ccache-${{ env.KERNEL_TAG }}-
             gaokun3-ccache-

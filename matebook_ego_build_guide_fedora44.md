@@ -13,7 +13,7 @@
 
 本文使用项目内已有内容，不需要额外获取设备专属仓库：
 
-- `gaokun-patches/`
+- `patches/`
 - `defconfig/`
 - `dts/`
 - `tools/`
@@ -70,7 +70,7 @@ export IMAGE_FILE=$WORKDIR/fedora-44-gaokun3.img
 cd $KERN_SRC
 
 # 应用项目内置补丁
-git am $GAOKUN_DIR/gaokun-patches/*.patch
+git am $GAOKUN_DIR/patches/*.patch
 
 # 覆盖内核源码中的 defconfig，并拷入项目维护的 DTS 文件
 install -Dm644 \
