@@ -18,7 +18,7 @@ on:
       desktop_environment:
         description: Desktop environment metapackage
         required: true
-        default: "ubuntu-desktop"
+        default: "ubuntu-desktop-minimal"
       extra_packages:
         description: Extra packages to install (space-separated)
         required: true

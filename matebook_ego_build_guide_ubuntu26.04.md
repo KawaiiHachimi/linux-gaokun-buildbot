@@ -155,7 +155,7 @@ apt-get install -y \
 
 # 安装桌面环境与常用软件
 apt-get install -y \
-    ubuntu-desktop \
+    ubuntu-desktop-minimal \
     fonts-noto-color-emoji \
     fcitx5 fcitx5-chinese-addons \
     gnome-tweaks gnome-shell-extension-manager \
