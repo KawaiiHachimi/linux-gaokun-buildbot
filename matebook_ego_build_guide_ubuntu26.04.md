@@ -156,11 +156,28 @@ apt-get install -y \
     wget curl ca-certificates gnupg lsb-release \
     less file sudo
 
+# 配置 Mozilla 官方 APT 仓库，安装原生 deb 版 Firefox
+install -d -m 0755 /etc/apt/keyrings
+wget -qO- https://packages.mozilla.org/apt/repo-signing-key.gpg | \
+    gpg --dearmor -o /etc/apt/keyrings/packages.mozilla.org.gpg
+
+cat > /etc/apt/sources.list.d/mozilla.list <<EOF
+deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.gpg] https://packages.mozilla.org/apt mozilla main
+EOF
+
+cat > /etc/apt/preferences.d/mozilla <<EOF
+Package: *
+Pin: origin packages.mozilla.org
+Pin-Priority: 1000
+EOF
+
+apt-get update
+
 # 安装桌面环境与常用软件
 apt-get install -y \
     ubuntu-desktop-minimal \
     fonts-noto-color-emoji \
-    fcitx5 fcitx5-chinese-addons \
+    fcitx5-chinese-addons \
     gnome-tweaks gnome-shell-extension-manager \
     mpv v4l-utils vim git htop fastfetch screen \
     alsa-utils pipewire-alsa \
