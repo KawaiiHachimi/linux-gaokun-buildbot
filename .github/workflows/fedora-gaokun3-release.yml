@@ -18,11 +18,11 @@ on:
       excluded_packages:
         description: Packages to exclude from rootfs install (comma-separated)
         required: true
-        default: "gnome-boxes,gnome-connections,gnome-browser-connector,snapshot,gnome-weather,gnome-contacts,gnome-maps,simple-scan,gnome-clocks,gnome-calculator,gnome-calendar"
+        default: "gnome-boxes,gnome-connections,snapshot,gnome-weather,gnome-contacts,gnome-maps,simple-scan,gnome-clocks,gnome-calculator,gnome-calendar"
       extra_packages:
         description: Extra packages to install (space-separated)
         required: true
-        default: "fcitx5-chinese-addons gnome-tweaks telnet mpv v4l-utils vim git htop fastfetch screen firefox"
+        default: "fcitx5-chinese-addons gnome-tweaks gnome-extensions-app telnet mpv v4l-utils vim git htop fastfetch screen firefox"
       rebuild_package_rpms:
         description: Rebuild gaokun package RPMs before image build
         required: true
@@ -155,6 +155,7 @@ jobs:
                 @core @standard "'"$DESKTOP_ENVIRONMENT"'" \
                 grub2-efi-aa64-modules efibootmgr shim-aa64 alsa-ucm \
                 langpacks-en langpacks-zh_CN \
+                google-noto-color-emoji-fonts google-noto-emoji-fonts \
                 alsa-utils pipewire-utils \
                 '"$EXTRA_PACKAGES"'
 
@@ -162,7 +163,11 @@ jobs:
                 install \
                 https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-'"$FEDORA_RELEASE"'.noarch.rpm
 
+              mkdir -p /etc/pki/rpm-gpg
+              cp -a "'"$ROOTFS_DIR"'/etc/pki/rpm-gpg/." /etc/pki/rpm-gpg/
+
               dnf -y --installroot="'"$ROOTFS_DIR"'" --releasever="'"$FEDORA_RELEASE"'" --forcearch=aarch64 --use-host-config \
+                --setopt=reposdir="'"$ROOTFS_DIR"'/etc/yum.repos.d,/etc/yum.repos.d" \
                 install \
                 libavcodec-freeworld
             '
