@@ -61,6 +61,8 @@ prepare_kernel_package() {
     "$KERNEL_STAGE/boot/config-$KREL"
   install -Dm644 "$KERN_OUT/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dtb" \
     "$KERNEL_STAGE/boot/dtb-$KREL/qcom/sc8280xp-huawei-gaokun3.dtb"
+  install -Dm644 "$KERN_OUT/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3-el2.dtb" \
+    "$KERNEL_STAGE/boot/dtb-$KREL/qcom/sc8280xp-huawei-gaokun3-el2.dtb"
 }
 
 prepare_modules_package() {

@@ -27,6 +27,7 @@ cp -a boot %{buildroot}/
 /boot/System.map-@KREL@
 /boot/config-@KREL@
 /boot/dtb-@KREL@/qcom/sc8280xp-huawei-gaokun3.dtb
+/boot/dtb-@KREL@/qcom/sc8280xp-huawei-gaokun3-el2.dtb
 
 %changelog
 * Sat Mar 28 2026 cool <bilibili@att.net> - @KREL_VERSION@-1

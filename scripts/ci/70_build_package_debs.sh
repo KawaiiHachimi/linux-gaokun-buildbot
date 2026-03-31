@@ -41,6 +41,8 @@ prepare_image_package() {
     "$IMAGE_STAGE/boot/config-$KREL"
   install -Dm644 "$KERN_OUT/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dtb" \
     "$IMAGE_STAGE/usr/lib/linux-image-$KREL/qcom/sc8280xp-huawei-gaokun3.dtb"
+  install -Dm644 "$KERN_OUT/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3-el2.dtb" \
+    "$IMAGE_STAGE/usr/lib/linux-image-$KREL/qcom/sc8280xp-huawei-gaokun3-el2.dtb"
 }
 
 prepare_modules_package() {
