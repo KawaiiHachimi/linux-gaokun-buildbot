@@ -170,6 +170,9 @@ update-initramfs -c -k "$KREL"
 # Ubuntu GRUB's 10_linux looks for /boot/dtb-$KREL
 cp "/usr/lib/linux-image-$KREL/qcom/sc8280xp-huawei-gaokun3.dtb" "/boot/dtb-$KREL"
 
+# EL2 DTB is expected in build artifacts; copy it unconditionally.
+cp "/usr/lib/linux-image-$KREL/qcom/sc8280xp-huawei-gaokun3-el2.dtb" "/boot/dtb-el2-$KREL"
+
 ROOT_UUID="$(blkid -s UUID -o value /dev/disk/by-label/rootfs)"
 mkdir -p /boot/efi/EFI/BOOT /boot/efi/EFI/ubuntu
 cat > /etc/default/grub <<'EOF'
@@ -199,6 +202,20 @@ grub-mkimage -c /tmp/early-grub.cfg \
     configfile reboot echo test extcmd efifwsetup
 
 rm -f /tmp/early-grub.cfg
+
+cat > /etc/grub.d/11_gaokun_el2 <<SCRIPTEOF
+#!/bin/sh
+exec tail -n +3 \$0
+
+menuentry 'Ubuntu ${KREL} (EL2 Hypervisor)' --class ubuntu --class gnu-linux --class gnu --class os {
+        search --no-floppy --fs-uuid --set=root ${ROOT_UUID}
+        linux   /boot/vmlinuz-${KREL} root=UUID=${ROOT_UUID} clk_ignore_unused pd_ignore_unused arm64.nopauth iommu.passthrough=0 iommu.strict=0 pcie_aspm.policy=powersupersave modprobe.blacklist=simpledrm efi=noruntime fbcon=rotate:1 usbhid.quirks=0x12d1:0x10b8:0x20000000 consoleblank=0 loglevel=4 psi=1
+        initrd  /boot/initrd.img-${KREL}
+        devicetree /boot/dtb-el2-${KREL}
+}
+SCRIPTEOF
+chmod +x /etc/grub.d/11_gaokun_el2
+
 update-grub
 
 mkdir -p /boot/grub/arm64-efi

@@ -217,7 +217,7 @@ jobs:
           sudo cp "$GAOKUN_DIR/tools/audio/sc8280xp.conf" \
             "$ROOTFS_DIR/usr/share/alsa/ucm2/Qualcomm/sc8280xp/"
 
-      - name: Create disk image and configure boot
+      - name: Create disk image and configure boot (EL2 DTB mandatory)
         run: |
           scripts/ci/50_make_image_fedora.sh
 

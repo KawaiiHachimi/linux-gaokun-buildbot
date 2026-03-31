@@ -154,12 +154,27 @@ GRUB_CMDLINE_LINUX="clk_ignore_unused pd_ignore_unused arm64.nopauth iommu.passt
 GRUB_DEFAULT_DTB="qcom/sc8280xp-huawei-gaokun3.dtb"
 GRUBEOF
 
+ROOT_UUID="$(blkid -s UUID -o value /dev/disk/by-label/rootfs)"
+
 echo 'GRUB_DISABLE_OS_PROBER=true' >> /etc/default/grub
+
+cat > /etc/grub.d/11_gaokun_el2 <<SCRIPTEOF
+#!/bin/sh
+exec tail -n +3 \$0
+
+menuentry 'Fedora ${KREL} (EL2 Hypervisor)' --class fedora --class gnu-linux --class gnu --class os {
+        search --no-floppy --fs-uuid --set=root ${ROOT_UUID}
+        linux /boot/vmlinuz-${KREL} root=UUID=${ROOT_UUID} rootflags=subvol=@ clk_ignore_unused pd_ignore_unused arm64.nopauth iommu.passthrough=0 iommu.strict=0 pcie_aspm.policy=powersupersave modprobe.blacklist=simpledrm efi=noruntime fbcon=rotate:1 usbhid.quirks=0x12d1:0x10b8:0x20000000 consoleblank=0 loglevel=4 psi=1
+        initrd /boot/initramfs-${KREL}.img
+    devicetree /boot/dtb-${KREL}/qcom/sc8280xp-huawei-gaokun3-el2.dtb
+}
+SCRIPTEOF
+chmod +x /etc/grub.d/11_gaokun_el2
+
 grub2-install --target=arm64-efi --efi-directory=/boot/efi --boot-directory=/boot --removable --force
 grub2-mkconfig -o /boot/grub2/grub.cfg
 sed -i 's/^GRUB_DISABLE_OS_PROBER=true$/GRUB_DISABLE_OS_PROBER=false/' /etc/default/grub
 
-ROOT_UUID="$(blkid -s UUID -o value /dev/disk/by-label/rootfs)"
 mkdir -p /boot/efi/EFI/BOOT /boot/efi/EFI/fedora
 cat > /boot/efi/EFI/BOOT/grub.cfg <<EOF
 search --no-floppy --fs-uuid --set=root ${ROOT_UUID}

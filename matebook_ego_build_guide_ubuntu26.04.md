@@ -217,8 +217,15 @@ sudo cp $KERN_OUT/arch/arm64/boot/Image \
 sudo mkdir -p $ROOTFS_DIR/usr/lib/linux-image-$KREL/qcom
 sudo cp $KERN_OUT/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dtb \
      $ROOTFS_DIR/usr/lib/linux-image-$KREL/qcom/sc8280xp-huawei-gaokun3.dtb
+# EL2 DTB 默认在构建产物中，直接复制
+sudo cp $KERN_OUT/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3-el2.dtb \
+     $ROOTFS_DIR/usr/lib/linux-image-$KREL/qcom/sc8280xp-huawei-gaokun3-el2.dtb
+# 正常引导使用的 DTB（供 10_linux 自动生成条目）
 sudo cp $KERN_OUT/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dtb \
      $ROOTFS_DIR/boot/dtb-$KREL
+# EL2 引导使用的 DTB（供自定义 GRUB 条目使用）
+sudo cp $KERN_OUT/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3-el2.dtb \
+     $ROOTFS_DIR/boot/dtb-el2-$KREL
 
 # 直接复制项目内置的最小固件集
 sudo mkdir -p $ROOTFS_DIR/lib/firmware
@@ -474,6 +481,21 @@ grub-mkimage -c /tmp/early-grub.cfg \
     configfile reboot echo test extcmd efifwsetup
 
 rm -f /tmp/early-grub.cfg
+# 为 EL2 DTB 新增 GRUB 自定义引导项
+# 使用 11_ 前缀，使其排在 10_linux 自动生成条目之后
+cat > /etc/grub.d/11_gaokun_el2 <<SCRIPTEOF
+#!/bin/sh
+exec tail -n +3 \$0
+
+menuentry 'Ubuntu ${KREL} (EL2 Hypervisor)' --class ubuntu --class gnu-linux --class gnu --class os {
+    search --no-floppy --fs-uuid --set=root ${ROOT_UUID}
+    linux   /boot/vmlinuz-${KREL} root=UUID=${ROOT_UUID} clk_ignore_unused pd_ignore_unused arm64.nopauth iommu.passthrough=0 iommu.strict=0 pcie_aspm.policy=powersupersave modprobe.blacklist=simpledrm efi=noruntime fbcon=rotate:1 usbhid.quirks=0x12d1:0x10b8:0x20000000 consoleblank=0 loglevel=4 psi=1
+    initrd  /boot/initrd.img-${KREL}
+    devicetree /boot/dtb-el2-${KREL}
+}
+SCRIPTEOF
+chmod +x /etc/grub.d/11_gaokun_el2
+
 update-grub
 mkdir -p /boot/grub/arm64-efi
 cp -a /usr/lib/grub/arm64-efi/. /boot/grub/arm64-efi/

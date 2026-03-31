@@ -158,6 +158,10 @@ sudo mkdir -p $ROOTFS_DIR/boot/dtb-$KREL/qcom
 sudo cp $KERN_OUT/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3.dtb \
     $ROOTFS_DIR/boot/dtb-$KREL/qcom/
 
+# EL2 DTB 默认在构建产物中，直接复制（用于自定义 EL2 引导菜单）
+sudo cp $KERN_OUT/arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3-el2.dtb \
+    $ROOTFS_DIR/boot/dtb-$KREL/qcom/
+
 # 直接复制项目内置的最小固件集
 sudo mkdir -p $ROOTFS_DIR/lib/firmware
 sudo cp -r $FW_REPO/. $ROOTFS_DIR/lib/firmware/
@@ -366,6 +370,21 @@ GRUBEOF
 
 # 仅在生成镜像时临时禁用 os-prober，避免把宿主机系统探测进来
 echo 'GRUB_DISABLE_OS_PROBER=true' >> /etc/default/grub
+
+# 创建 EL2 引导条目
+cat > /etc/grub.d/11_gaokun_el2 <<SCRIPTEOF
+#!/bin/sh
+exec tail -n +3 \$0
+
+menuentry 'Fedora ${KREL} (EL2 Hypervisor)' --class fedora --class gnu-linux --class gnu --class os {
+    search --no-floppy --fs-uuid --set=root ${ROOT_UUID}
+    linux /boot/vmlinuz-${KREL} root=UUID=${ROOT_UUID} rootflags=subvol=@ clk_ignore_unused pd_ignore_unused arm64.nopauth iommu.passthrough=0 iommu.strict=0 pcie_aspm.policy=powersupersave modprobe.blacklist=simpledrm efi=noruntime fbcon=rotate:1 usbhid.quirks=0x12d1:0x10b8:0x20000000 consoleblank=0 loglevel=4 psi=1
+    initrd /boot/initramfs-${KREL}.img
+    devicetree /boot/dtb-$KREL/qcom/sc8280xp-huawei-gaokun3-el2.dtb
+}
+SCRIPTEOF
+chmod +x /etc/grub.d/11_gaokun_el2
+
 grub2-install --target=arm64-efi --efi-directory=/boot/efi --boot-directory=/boot --removable --force
 grub2-mkconfig -o /boot/grub2/grub.cfg
 sed -i 's/^GRUB_DISABLE_OS_PROBER=true$/GRUB_DISABLE_OS_PROBER=false/' /etc/default/grub
@@ -389,7 +408,7 @@ EOF
 cp /boot/efi/EFI/BOOT/grub.cfg /boot/efi/EFI/fedora/grub.cfg
 
 # 可选：确认最终 grub.cfg 中已经带上 devicetree
-grep -n "devicetree" /boot/grub2/grub.cfg
+grep -n "devicetree\|dtb" /boot/grub2/grub.cfg
 exit
 ```
 
