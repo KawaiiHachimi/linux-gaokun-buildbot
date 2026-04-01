@@ -87,6 +87,7 @@ jobs:
           git -C "$KERN_SRC" config user.email "github-actions[bot]@users.noreply.github.com"
 
           git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/*.patch
+          git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/el2/*.patch
 
           unset KCONFIG_CONFIG
           make -C "$KERN_SRC" O="$KERN_OUT" ARCH=arm64 CROSS_COMPILE="$CROSS_COMPILE" gaokun3_defconfig

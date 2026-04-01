@@ -74,6 +74,8 @@ cd $KERN_SRC
 
 # 应用项目内置补丁
 git am $GAOKUN_DIR/patches/*.patch
+# EL2 Hypervisor 相关补丁单独放在 el2/ 目录下，按需应用
+git am $GAOKUN_DIR/patches/el2/*.patch
 
 mkdir -p $KERN_OUT
 
