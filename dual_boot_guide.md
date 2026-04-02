@@ -43,13 +43,7 @@ Windows 一般可由 `systemd-boot` 自动探测，所以无需额外修改 Wind
 
 ## 补充说明（EL2 可选）
 
-EL2 专用文档：[el2_kvm_guide.md](el2_kvm_guide.md)
-
-推荐顺序：
-
-1. 先按本篇完成 Windows + Linux 双启动。
-2. 再按 [el2_kvm_guide.md](el2_kvm_guide.md) 部署 `slbounceaa64.efi`、`qebspilaa64.efi`、`tcblaunch.exe` 以及 firmware 文件。
-3. 在 `systemd-boot` 中选择 EL2 菜单项启动，并按 EL2 文档完成 KVM 验证。
+若镜像已带好 EL2 所需文件，完成本篇后直接在 `systemd-boot` 中选择 EL2 菜单项启动即可，详见 [el2_kvm_guide.md](el2_kvm_guide.md)。
 
 ## 常见提醒
 
