@@ -332,6 +332,9 @@ cat > /etc/kernel/install.conf <<EOF
 layout=bls
 EOF
 
+install -d /etc/kernel/install.d
+ln -sf /dev/null /etc/kernel/install.d/51-dracut-rescue.install
+
 cat > /etc/kernel/cmdline <<EOF
 root=UUID=${ROOT_UUID} rootflags=subvol=@ clk_ignore_unused pd_ignore_unused arm64.nopauth iommu.passthrough=0 iommu.strict=0 pcie_aspm.policy=powersupersave efi=noruntime fbcon=rotate:1 usbhid.quirks=0x12d1:0x10b8:0x20000000 consoleblank=0 loglevel=4 psi=1
 EOF
@@ -352,7 +355,7 @@ MACHINE_ID=$(cat /etc/machine-id)
 bootctl --esp-path=/boot/efi install
 
 kernel-install --make-entry-directory=yes --entry-token=machine-id add \
-    $KREL /boot/vmlinuz-$KREL /boot/initramfs-$KREL.img
+    $KREL /boot/vmlinuz-$KREL
 
 if [ -n "$KREL_EL2" ]; then
     mkdir -p /boot/efi/EFI/systemd/drivers
@@ -370,7 +373,7 @@ qcom/sc8280xp-huawei-gaokun3-el2.dtb
 EOF
     KERNEL_INSTALL_CONF_ROOT=$EL2_CONF_ROOT \
         kernel-install --make-entry-directory=yes --entry-token=machine-id add \
-        $KREL_EL2 /boot/vmlinuz-$KREL_EL2 /boot/initramfs-$KREL_EL2.img
+        $KREL_EL2 /boot/vmlinuz-$KREL_EL2
     rm -rf $EL2_CONF_ROOT
 
     cp $GAOKUN_DIR/tools/el2/slbounceaa64.efi /boot/efi/EFI/systemd/drivers/
@@ -399,6 +402,7 @@ exit
 - 这里不再手工维护 `loader/entries/*.conf` 和 `gaokun3/fedora/...` 目录，而是让 `kernel-install` 生成标准 BLS Type #1 布局。
 - 默认使用 `--entry-token=machine-id`，因此条目名会变成 `/boot/efi/loader/entries/<machine-id>-<kernel-release>.conf`。
 - Fedora 44 的 `90-loaderentry.install` 会从 `/usr/lib/modules/<kernel-release>/dtb/` 查找设备树，所以 DTB 必须放到这个标准路径里。
+- Fedora 默认的 `51-dracut-rescue.install` 会额外生成 `0-rescue` 启动项，但这个救援项默认不带 `devicetree`，在 gaokun3 上不可用，因此这里显式将其禁用。
 
 ### 4. 收尾清理
 

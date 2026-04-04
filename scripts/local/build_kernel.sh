@@ -266,9 +266,15 @@ build_kernel() {
 
     {
         sudo kernel-install --entry-token=machine-id remove "$krel" >/dev/null 2>&1 || true
-        sudo env KERNEL_INSTALL_CONF_ROOT="$conf_root" \
-            kernel-install --verbose --make-entry-directory=yes --entry-token=machine-id add \
-            "$krel" "/boot/vmlinuz-$krel" "/boot/$initrd_src"
+        if [ "$DISTRO" == "fedora" ]; then
+            sudo env KERNEL_INSTALL_CONF_ROOT="$conf_root" \
+                kernel-install --verbose --make-entry-directory=yes --entry-token=machine-id add \
+                "$krel" "/boot/vmlinuz-$krel"
+        else
+            sudo env KERNEL_INSTALL_CONF_ROOT="$conf_root" \
+                kernel-install --verbose --make-entry-directory=yes --entry-token=machine-id add \
+                "$krel" "/boot/vmlinuz-$krel" "/boot/$initrd_src"
+        fi
     } || {
         if [ "$restore_kernel_conf" -eq 1 ]; then
             for name in install.conf cmdline devicetree; do

@@ -45,11 +45,18 @@ if [ "$1" -ge 1 ] && command -v dracut >/dev/null 2>&1 && command -v kernel-inst
     printf '%s\n' "$cmdline" > "$temp_conf_root/cmdline"
     printf 'qcom/@DTB_FILE@\n' > "$temp_conf_root/devicetree"
 
+    install -d /etc/kernel/install.d
+    ln -sf /dev/null /etc/kernel/install.d/51-dracut-rescue.install
+    kernel-install --entry-token=machine-id remove 0-rescue >/dev/null 2>&1 || :
+    rm -rf /boot/*0-rescue* \
+           /boot/efi/*/0-rescue \
+           /boot/efi/loader/entries/*-0-rescue.conf >/dev/null 2>&1 || :
+
     dracut --force --kver @KREL@ >/dev/null 2>&1 || :
     kernel-install --entry-token=machine-id remove @KREL@ >/dev/null 2>&1 || :
     KERNEL_INSTALL_CONF_ROOT="$temp_conf_root" \
         kernel-install --make-entry-directory=yes --entry-token=machine-id add \
-        @KREL@ /boot/vmlinuz-@KREL@ /boot/initramfs-@KREL@.img >/dev/null 2>&1 || :
+        @KREL@ /boot/vmlinuz-@KREL@ >/dev/null 2>&1 || :
 fi
 
 %preun

@@ -154,6 +154,9 @@ cat > /etc/kernel/install.conf <<'EOF'
 layout=bls
 EOF
 
+install -d /etc/kernel/install.d
+ln -sf /dev/null /etc/kernel/install.d/51-dracut-rescue.install
+
 cat > /etc/kernel/cmdline <<EOF
 root=UUID=$ROOT_UUID rootflags=subvol=@ clk_ignore_unused pd_ignore_unused arm64.nopauth iommu.passthrough=0 iommu.strict=0 pcie_aspm.policy=powersupersave efi=noruntime fbcon=rotate:1 usbhid.quirks=0x12d1:0x10b8:0x20000000 consoleblank=0 loglevel=4 psi=1
 EOF
@@ -176,9 +179,8 @@ bootctl --esp-path=/boot/efi install
 run_kernel_install() {
   local krel="$1"
   local image="$2"
-  local initrd="$3"
-  local dtb="$4"
-  local cmdline="$5"
+  local dtb="$3"
+  local cmdline="$4"
   local conf_root
 
   conf_root="$(mktemp -d)"
@@ -191,7 +193,7 @@ EOF
   kernel-install --entry-token=machine-id remove "$krel" || true
   KERNEL_INSTALL_CONF_ROOT="$conf_root" \
     kernel-install --verbose --make-entry-directory=yes --entry-token=machine-id add \
-    "$krel" "$image" "$initrd"
+    "$krel" "$image"
   rm -rf "$conf_root"
 }
 
@@ -199,7 +201,6 @@ BASE_CMDLINE="$(cat /etc/kernel/cmdline)"
 run_kernel_install \
   "$KREL" \
   "/boot/vmlinuz-$KREL" \
-  "/boot/initramfs-$KREL.img" \
   "sc8280xp-huawei-gaokun3.dtb" \
   "$BASE_CMDLINE"
 
@@ -208,7 +209,6 @@ if [[ "$BUILD_EL2" == "true" && -n "$KREL_EL2" ]]; then
   run_kernel_install \
     "$KREL_EL2" \
     "/boot/vmlinuz-$KREL_EL2" \
-    "/boot/initramfs-$KREL_EL2.img" \
     "sc8280xp-huawei-gaokun3-el2.dtb" \
     "$EL2_CMDLINE"
 fi
