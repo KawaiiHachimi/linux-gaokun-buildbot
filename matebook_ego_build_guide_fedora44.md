@@ -404,6 +404,11 @@ exit
 - Fedora 44 的 `90-loaderentry.install` 会从 `/usr/lib/modules/<kernel-release>/dtb/` 查找设备树，所以 DTB 必须放到这个标准路径里。
 - Fedora 默认的 `51-dracut-rescue.install` 会额外生成 `0-rescue` 启动项，但这个救援项默认不带 `devicetree`，在 gaokun3 上不可用，因此这里显式将其禁用。
 
+### 触屏驱动鸣谢
+
+- [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux)：本仓库 Fedora 镜像中预装的 `himax-spi` DKMS 触屏驱动来源与主要上游参考。
+- [awarson2233/EGoTouchRev](https://github.com/awarson2233/EGoTouchRev)：EGoTouchRev-Linux 所参考的 Windows 侧触控算法项目，也是本方案触摸算法调参与行为的重要上游来源。
+
 ### 4. 收尾清理
 
 ```bash

@@ -8,6 +8,7 @@ Release:        1%{?dist}
 Summary:        Development files for the gaokun3 kernel
 License:        GPL-2.0-only
 BuildArch:      aarch64
+AutoReqProv:    no
 Source0:        @SOURCE_NAME@
 Requires:       @REQUIRES_MODULES@ = %{version}-%{release}
 
