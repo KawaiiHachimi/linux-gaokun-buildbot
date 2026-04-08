@@ -268,7 +268,7 @@ jobs:
             --user root \
             "fedora:${FEDORA_RELEASE}" \
             bash -euxo pipefail -c '
-              dnf -y --installroot="'"$ROOTFS_DIR"'" --releasever="'"$FEDORA_RELEASE"'" --use-host-config --nogpgcheck \
+              dnf -y --installroot="'"$ROOTFS_DIR"'" --releasever="'"$FEDORA_RELEASE"'" --use-host-config --nogpgcheck --allowerasing \
                 install \
                 '"$rpm_install_args_string"'
             '

@@ -8,6 +8,8 @@ Summary:        Firmware bundle for gaokun3
 License:        Redistributable, no modification permitted
 BuildArch:      noarch
 Source0:        @SOURCE_NAME@
+Conflicts:      atheros-firmware qcom-firmware
+Obsoletes:      atheros-firmware qcom-firmware
 
 %description
 Firmware bundle for Huawei MateBook E Go 2023 (gaokun3) image builds.
