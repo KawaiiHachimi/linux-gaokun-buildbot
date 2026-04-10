@@ -2,7 +2,9 @@
 
 # linux-gaokun-buildbot
 
-面向华为 MateBook E Go 2023（`gaokun3` / `SC8280XP`）的 Linux 镜像构建脚本、补丁、内核配置、设备树文件、工具和固件。
+面向华为 MateBook E Go 2023（代号 `gaokun3`）的 Linux 镜像构建脚本、补丁、内核配置、设备树文件、工具和固件。
+
+该设备基于高通骁龙 8cx Gen3（`SC8280XP`）平台。
 
 镜像流水线现默认使用 `systemd-boot`，并可选构建带 `CONFIG_LOCALVERSION="-gaokun3-el2"` 的第二套 EL2 内核变体。
 
@@ -41,11 +43,12 @@
 ## 快速开始
 
 - 双系统引导指南：[English](dual_boot_guide_en.md) | [中文](dual_boot_guide_zh.md)
-- EL2 + KVM 指南：[English](el2_kvm_guide_en.md) | [中文](el2_kvm_guide_zh.md)
+- EL2 实现说明：[English](el2_kvm_guide_en.md) | [中文](el2_kvm_guide_zh.md)
 - 构建指南 – Fedora 44：[English](matebook_ego_build_guide_fedora44_en.md) | [中文](matebook_ego_build_guide_fedora44_zh.md)
 - 构建指南 – Ubuntu 26.04：[English](matebook_ego_build_guide_ubuntu26.04_en.md) | [中文](matebook_ego_build_guide_ubuntu26.04_zh.md)
 - GitHub Actions – Fedora：[.github/workflows/fedora-gaokun3-release.yml](../.github/workflows/fedora-gaokun3-release.yml)
 - GitHub Actions – Ubuntu：[.github/workflows/ubuntu-gaokun3-release.yml](../.github/workflows/ubuntu-gaokun3-release.yml)
+- 仓库校验工作流：[.github/workflows/repo-validation.yml](../.github/workflows/repo-validation.yml)
 
 ## 参考
 
