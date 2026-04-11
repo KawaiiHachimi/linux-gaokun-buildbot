@@ -8,6 +8,8 @@ The image pipeline now uses `systemd-boot` by default and can optionally build a
 
 ## What is included
 
+### Repository layout
+
 - `patches/`: kernel patches and device support changes
 - `defconfig/`: local kernel configuration used by CI/manual builds
 - `drivers/`: local mirrors of the patched driver sources kept in the patch series
@@ -19,6 +21,8 @@ The image pipeline now uses `systemd-boot` by default and can optionally build a
 - `scripts/ci/`: workflow build, image creation, and packaging scripts
 - `scripts/local/`: some useful scripts that can be run on the local device
 
+### Package outputs
+
 The package pipeline builds and installs dedicated package sets:
 
 - **Fedora (RPM)**: `kernel-gaokun3`, `kernel-modules-gaokun3`, `kernel-devel-gaokun3`, `linux-firmware-gaokun3`
@@ -26,6 +30,29 @@ The package pipeline builds and installs dedicated package sets:
 - **Optional EL2 variants**: `*-gaokun3-el2` package set for the second EL2 kernel build
 - Ubuntu kernel image packages run `update-initramfs` during install/upgrade, which in turn refreshes the BLS entry through the distro `systemd-boot` hook.
 - Fedora kernel RPMs now ship a matching `dracut.conf.d` snippet and run `dracut` + `kernel-install add` in `%posttrans`, so installing or upgrading the package refreshes the initramfs and BLS entry automatically.
+
+### Releases
+
+- Fedora and Ubuntu image releases contain compressed installable images.
+- Gaokun RPM and DEB releases contain the standalone kernel and firmware package sets used by the image workflows.
+
+### Patch Sources
+
+- `0001` to `0009` and `0017`: adapted from [right-0903/linux-gaokun](https://github.com/right-0903/linux-gaokun) for the base SC8280XP / gaokun3 enablement, display bring-up, EC suspend/resume, ADSP FastRPC, and DSI stability work
+- `0010`: adapted from [whitelewi1-ctrl/matebook-e-go-linux](https://github.com/whitelewi1-ctrl/matebook-e-go-linux) to avoid setting `USE_BDADDR_PROPERTY` when the adapter address is invalid
+- `0011`: local change in this repository to enable DSC and allow 60 Hz / 120 Hz switching
+- `0012`: adapted from [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux) to add the Himax HX83121A SPI touchscreen driver
+- `0013`: adapted from [TheUnknownThing/linux-gaokun](https://github.com/TheUnknownThing/linux-gaokun) to improve UCSI handling and module wiring for the Type-C path
+- `0014` to `0016`: adapted from the Qualcomm Iris SC8280XP series on lore.kernel.org to add SC8280XP media/iris and Venus support: <https://lore.kernel.org/all/20260125-iris-sc8280xp-v3-2-d21861a9ea33@oss.qualcomm.com/>
+- `0099`: local patch in this repository to import the current DTS files and `gaokun3_defconfig`
+- EL2 `0001` to `0024`: adapted from [TravMurav/linux](https://github.com/TravMurav/linux/tree/x13s-6.18-v1.1-cxsd) for the EL2 boot path, including SMP2P handover, remoteproc attach/restart flow, SCM/SHM owner handling, and related rpmsg/QRTR/pmic_glink stability fixes
+
+### Tool Sources
+
+- `tools/audio`, `tools/bluetooth`, and `tools/touchpad`: adapted from [whitelewi1-ctrl/matebook-e-go-linux](https://github.com/whitelewi1-ctrl/matebook-e-go-linux)
+- `tools/el2/qebspilaa64.efi`: sourced from [stephan-gh/qebspil](https://github.com/stephan-gh/qebspil)
+- `tools/el2/slbounceaa64.efi`: sourced from [TravMurav/slbounce](https://github.com/TravMurav/slbounce)
+- `tools/touchscreen-tuner`: adapted from [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux), with GTK4 GUI improvements in this repository
 
 ## Boot artifact layout
 
@@ -40,27 +67,15 @@ The image and local-install workflows now follow the standard `kernel-install` +
 
 ## Getting started
 
+- Release: <https://github.com/KawaiiHachimi/linux-gaokun-build/releases>
 - Dual-boot guide: [English](docs/dual_boot_guide_en.md) | [中文](docs/dual_boot_guide_zh.md)
 - EL2 implementation notes: [English](docs/el2_kvm_guide_en.md) | [中文](docs/el2_kvm_guide_zh.md)
 - Build guide – Fedora 44: [English](docs/matebook_ego_build_guide_fedora44_en.md) | [中文](docs/matebook_ego_build_guide_fedora44_zh.md)
 - Build guide – Ubuntu 26.04: [English](docs/matebook_ego_build_guide_ubuntu26.04_en.md) | [中文](docs/matebook_ego_build_guide_ubuntu26.04_zh.md)
-- GitHub Actions – Fedora: [.github/workflows/fedora-gaokun3-release.yml](.github/workflows/fedora-gaokun3-release.yml)
-- GitHub Actions – Ubuntu: [.github/workflows/ubuntu-gaokun3-release.yml](.github/workflows/ubuntu-gaokun3-release.yml)
-- Repository validation: [.github/workflows/repo-validation.yml](.github/workflows/repo-validation.yml)
-
-## Patch sources
-
-- `0001` to `0009` and `0017`: adapted from [right-0903/linux-gaokun](https://github.com/right-0903/linux-gaokun)
-- `0010`: adapted from [whitelewi1-ctrl/matebook-e-go-linux](https://github.com/whitelewi1-ctrl/matebook-e-go-linux)
-- `0011`: local change in this repository to enable DSC and allow 60 Hz / 120 Hz switching
-- `0012`: adapted from [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux)
-- `0013`: adapted from [TheUnknownThing/linux-gaokun](https://github.com/TheUnknownThing/linux-gaokun)
-- `0014` to `0016`: adapted from the Qualcomm Iris SC8280XP series on lore.kernel.org: <https://lore.kernel.org/all/20260125-iris-sc8280xp-v3-2-d21861a9ea33@oss.qualcomm.com/>
-- `0099`: local patch in this repository to import the current DTS files and `gaokun3_defconfig`
 
 ## Feature Support
 
-For an overview of hardware support status on the device, see [right-0903/linux-gaokun Feature Support](https://github.com/right-0903/linux-gaokun?tab=readme-ov-file#feature-support).
+For an overview of hardware support status on the device, see [right-0903/linux-gaokun `## Feature Support`](https://github.com/right-0903/linux-gaokun?tab=readme-ov-file#feature-support).
 
 ## References
 

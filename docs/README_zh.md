@@ -8,6 +8,8 @@
 
 ## 包含内容
 
+### 仓库结构
+
 - `patches/`：内核补丁和设备支持更改
 - `defconfig/`：CI/手动构建使用的本地内核配置
 - `drivers/`：补丁系列中修改过的驱动源码本地镜像
@@ -19,6 +21,8 @@
 - `scripts/ci/`：工作流构建、镜像创建和打包脚本
 - `scripts/local/`：一些可在本地设备上运行的实用脚本
 
+### 软件包产物
+
 软件包流水线会构建并安装专用软件包集：
 
 - **Fedora (RPM)**：`kernel-gaokun3`、`kernel-modules-gaokun3`、`kernel-devel-gaokun3`、`linux-firmware-gaokun3`
@@ -26,6 +30,29 @@
 - **可选 EL2 变体**：用于第二套 EL2 内核构建的 `*-gaokun3-el2` 软件包集
 - Ubuntu 内核镜像包在安装/升级时运行 `update-initramfs`，进而通过发行版的 `systemd-boot` 钩子刷新 BLS 条目。
 - Fedora 内核 RPM 现自带匹配的 `dracut.conf.d` 片段，并在 `%posttrans` 中运行 `dracut` + `kernel-install add`，因此安装或升级软件包会自动刷新 initramfs 和 BLS 条目。
+
+### Release 产物
+
+- Fedora 和 Ubuntu 镜像 release 包含压缩后的可安装镜像。
+- Gaokun RPM 和 DEB release 包含镜像工作流所使用的独立内核与固件软件包集合。
+
+### 补丁来源
+
+- `0001` 到 `0009` 以及 `0017`：来自 [right-0903/linux-gaokun](https://github.com/right-0903/linux-gaokun)，涵盖基础 SC8280XP / gaokun3 使能、显示点亮、EC 挂起恢复、ADSP FastRPC 以及 DSI 稳定性相关改动
+- `0010`：来自 [whitelewi1-ctrl/matebook-e-go-linux](https://github.com/whitelewi1-ctrl/matebook-e-go-linux)，用于在蓝牙地址无效时避免设置 `USE_BDADDR_PROPERTY`
+- `0011`：本仓库内的本地改动，用于启用 DSC 以及 60 Hz / 120 Hz 切换
+- `0012`：来自 [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux)，用于加入 Himax HX83121A SPI 触摸屏驱动
+- `0013`：来自 [TheUnknownThing/linux-gaokun](https://github.com/TheUnknownThing/linux-gaokun)，用于改进 Type-C 路径的 UCSI 处理和模块接线
+- `0014` 到 `0016`：来自 lore.kernel.org 上的 Qualcomm Iris SC8280XP 系列补丁，用于加入 SC8280XP 的 media/iris 和 Venus 支持：<https://lore.kernel.org/all/20260125-iris-sc8280xp-v3-2-d21861a9ea33@oss.qualcomm.com/>
+- `0099`：本仓库内的本地补丁，用于导入当前的 DTS 文件和 `gaokun3_defconfig`
+- EL2 `0001` 到 `0024`：来自 [TravMurav/linux](https://github.com/TravMurav/linux/tree/x13s-6.18-v1.1-cxsd)，用于补齐 EL2 启动路径中的 SMP2P 接管、remoteproc attach/restart 流程、SCM/SHM owner 处理，以及 rpmsg / QRTR / pmic_glink 相关稳定性修复
+
+### Tools 来源
+
+- `tools/audio`、`tools/bluetooth` 和 `tools/touchpad`：来自 [whitelewi1-ctrl/matebook-e-go-linux](https://github.com/whitelewi1-ctrl/matebook-e-go-linux)
+- `tools/el2/qebspilaa64.efi`：来自 [stephan-gh/qebspil](https://github.com/stephan-gh/qebspil)
+- `tools/el2/slbounceaa64.efi`：来自 [TravMurav/slbounce](https://github.com/TravMurav/slbounce)
+- `tools/touchscreen-tuner`：来自 [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux)，本仓库对其做了 GTK4 GUI 改进
 
 ## 启动产物布局
 
@@ -40,27 +67,15 @@
 
 ## 快速开始
 
+- Release：<https://github.com/KawaiiHachimi/linux-gaokun-build/releases>
 - 双系统引导指南：[English](dual_boot_guide_en.md) | [中文](dual_boot_guide_zh.md)
 - EL2 实现说明：[English](el2_kvm_guide_en.md) | [中文](el2_kvm_guide_zh.md)
 - 构建指南 – Fedora 44：[English](matebook_ego_build_guide_fedora44_en.md) | [中文](matebook_ego_build_guide_fedora44_zh.md)
 - 构建指南 – Ubuntu 26.04：[English](matebook_ego_build_guide_ubuntu26.04_en.md) | [中文](matebook_ego_build_guide_ubuntu26.04_zh.md)
-- GitHub Actions – Fedora：[.github/workflows/fedora-gaokun3-release.yml](../.github/workflows/fedora-gaokun3-release.yml)
-- GitHub Actions – Ubuntu：[.github/workflows/ubuntu-gaokun3-release.yml](../.github/workflows/ubuntu-gaokun3-release.yml)
-- 仓库校验工作流：[.github/workflows/repo-validation.yml](../.github/workflows/repo-validation.yml)
-
-## 补丁来源
-
-- `0001` 到 `0009` 以及 `0017`：来自 [right-0903/linux-gaokun](https://github.com/right-0903/linux-gaokun)
-- `0010`：来自 [whitelewi1-ctrl/matebook-e-go-linux](https://github.com/whitelewi1-ctrl/matebook-e-go-linux)
-- `0011`：本仓库内的本地改动，用于启用 DSC 以及 60 Hz / 120 Hz 切换
-- `0012`：来自 [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux)
-- `0013`：来自 [TheUnknownThing/linux-gaokun](https://github.com/TheUnknownThing/linux-gaokun)
-- `0014` 到 `0016`：来自 lore.kernel.org 上的 Qualcomm Iris SC8280XP 系列补丁：<https://lore.kernel.org/all/20260125-iris-sc8280xp-v3-2-d21861a9ea33@oss.qualcomm.com/>
-- `0099`：本仓库内的本地补丁，用于导入当前的 DTS 文件和 `gaokun3_defconfig`
 
 ## 功能支持
 
-设备硬件工作情况可参考 [right-0903/linux-gaokun 的 Feature Support](https://github.com/right-0903/linux-gaokun?tab=readme-ov-file#feature-support)。
+设备硬件工作情况可参考 [right-0903/linux-gaokun 的 `## Feature Support`](https://github.com/right-0903/linux-gaokun?tab=readme-ov-file#feature-support)。
 
 ## 参考
 
