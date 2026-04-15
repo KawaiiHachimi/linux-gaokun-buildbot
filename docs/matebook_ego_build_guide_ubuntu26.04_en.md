@@ -320,6 +320,18 @@ sudo cp $GAOKUN_DIR/tools/bluetooth/patch-nvm-bdaddr.service \
     $ROOTFS_DIR/etc/systemd/system/
 sudo chmod +x $ROOTFS_DIR/usr/local/bin/patch-nvm-bdaddr.py
 
+# Wi-Fi stable MAC script, udev rule and service
+sudo cp $GAOKUN_DIR/tools/wifi/set-stable-wifi-mac.py \
+    $ROOTFS_DIR/usr/local/bin/
+sudo cp $GAOKUN_DIR/tools/wifi/gaokun-wifi-mac@.service \
+    $ROOTFS_DIR/etc/systemd/system/
+sudo cp $GAOKUN_DIR/tools/wifi/80-gaokun-wifi-mac.rules \
+    $ROOTFS_DIR/etc/udev/rules.d/
+sudo chmod +x $ROOTFS_DIR/usr/local/bin/set-stable-wifi-mac.py
+sudo mkdir -p $ROOTFS_DIR/etc/systemd/system/sys-subsystem-net-devices-wlP6p1s0.device.wants
+sudo ln -sf /etc/systemd/system/gaokun-wifi-mac@.service \
+    $ROOTFS_DIR/etc/systemd/system/sys-subsystem-net-devices-wlP6p1s0.device.wants/gaokun-wifi-mac@wlP6p1s0.service
+
 # Audio UCM configuration
 sudo cp $GAOKUN_DIR/tools/audio/sc8280xp.conf \
     $ROOTFS_DIR/usr/share/alsa/ucm2/Qualcomm/sc8280xp/
@@ -333,6 +345,9 @@ sudo cp $GAOKUN_DIR/tools/image-assets/usr/local/share/gaokun/monitors.xml \
 
 # bluetooth.conf now loads both btqca and uhid so BLE HoG mice/keyboards can stay connected.
 # patch-nvm-bdaddr.service patches qca/wcnhpnv21g.bin before bluetooth.service starts.
+# gaokun-wifi-mac@.service runs when the Wi-Fi device appears.
+# By default it derives a stable MAC from machine identity; if you want one
+# fixed MAC instead, place it in /etc/gaokun/wifi-mac-address inside the image.
 
 # Let Ubuntu's initramfs-tools include DSP firmware in early boot stage,
 # otherwise remoteproc may fail to find firmware before root filesystem is mounted in standard boot entry
