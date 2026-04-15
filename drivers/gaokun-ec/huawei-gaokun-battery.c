@@ -8,6 +8,7 @@
 #include <linux/auxiliary_bus.h>
 #include <linux/bits.h>
 #include <linux/delay.h>
+#include <linux/gpio/consumer.h>
 #include <linux/jiffies.h>
 #include <linux/module.h>
 #include <linux/notifier.h>
@@ -110,6 +111,7 @@ struct gaokun_psy {
 	unsigned long update_time;
 	struct gaokun_psy_bat_status status;
 	struct gaokun_psy_bat_info info;
+	struct gpio_desc *bat_sta;
 
 	char battery_model[0x10]; /* HB30A8P9ECW-22T, the real one is XXX-22A */
 	char battery_serial[0x10];
@@ -180,13 +182,19 @@ static const struct power_supply_desc gaokun_psy_adp_desc = {
 /* -------------------------------------------------------------------------- */
 /* Battery */
 
-static inline void gaokun_psy_get_bat_present(struct gaokun_psy *ecbat)
+static void gaokun_psy_get_bat_present(struct gaokun_psy *ecbat)
 {
-	int ret;
+	/* _STA */
+	int ret, val;
 	u8 present;
 
-	/* Some kind of initialization */
-	gaokun_ec_write(ecbat->ec, (u8 []){0x02, 0xB2, 1, 0x90});
+	/* in output mode, in and out bit are synced, so read the in bit */
+	val = gpiod_get_value(ecbat->bat_sta);
+	if (!val) {
+		/* Some kind of initialization */
+		gpiod_set_value(ecbat->bat_sta, 1);
+		gaokun_ec_write(ecbat->ec, (u8 []){0x02, 0xB2, 1, 0x90});
+	}
 
 	ret = gaokun_ec_psy_read_byte(ecbat->ec, EC_ADP_STATUS, &present);
 
@@ -201,7 +209,7 @@ static inline int gaokun_psy_bat_present(struct gaokun_psy *ecbat)
 static int gaokun_psy_get_bat_info(struct gaokun_psy *ecbat)
 {
 	/* _BIX */
-	if (!gaokun_psy_bat_present(ecbat))
+	if (!gaokun_psy_bat_present(ecbat)) /* TODO: ensure info is erased */
 		return 0;
 
 	return gaokun_ec_psy_multi_read(ecbat->ec, EC_BAT_INFO_START,
@@ -568,6 +576,7 @@ static int gaokun_psy_notify(struct notifier_block *nb,
 	case EC_EVENT_BAT_A1:
 	case EC_EVENT_BAT_A3:
 		if (action == EC_EVENT_BAT_A3) {
+			gaokun_psy_get_bat_present(ecbat);
 			gaokun_psy_get_bat_info(ecbat);
 			msleep(100);
 		}
@@ -595,6 +604,11 @@ static int gaokun_psy_probe(struct auxiliary_device *adev,
 	ecbat->ec = ec;
 	ecbat->dev = dev;
 	ecbat->nb.notifier_call = gaokun_psy_notify;
+
+	ecbat->bat_sta = devm_gpiod_get_optional(dev, "bat", GPIOD_OUT_LOW);
+	if (IS_ERR(ecbat->bat_sta))
+		dev_err_probe(dev, PTR_ERR(ecbat->bat_sta),
+			      "Failed to get bat-gpios\n");
 
 	auxiliary_set_drvdata(adev, ecbat);
 

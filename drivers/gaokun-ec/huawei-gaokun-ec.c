@@ -9,6 +9,7 @@
 #include <linux/cleanup.h>
 #include <linux/delay.h>
 #include <linux/device.h>
+#include <linux/gpio/consumer.h>
 #include <linux/hwmon.h>
 #include <linux/hwmon-sysfs.h>
 #include <linux/i2c.h>
@@ -118,6 +119,7 @@ struct gaokun_ec {
 	struct mutex lock; /* EC transaction lock */
 	struct blocking_notifier_head notifier_list;
 	struct device *hwmon_dev;
+	struct gpio_desc *lid_sta;
 	struct input_dev *idev;
 	bool suspended;
 };
@@ -626,9 +628,13 @@ static int gaokun_ec_suspend(struct device *dev)
 	if (ec->suspended)
 		return 0;
 
+	disable_irq(ec->client->irq);
+
 	ret = gaokun_ec_write(ec, ec_req);
-	if (ret)
+	if (ret) {
+		enable_irq(ec->client->irq);
 		return ret;
+	}
 
 	ec->suspended = true;
 
@@ -653,6 +659,10 @@ static int gaokun_ec_resume(struct device *dev)
 		msleep(100); /* EC need time to resume */
 	}
 
+	if (ret)
+		return ret;
+
+	enable_irq(ec->client->irq);
 	ec->suspended = false;
 
 	return 0;
@@ -729,6 +739,7 @@ static irqreturn_t gaokun_ec_irq_handler(int irq, void *data)
 	case EC_EVENT_LID:
 		gaokun_ec_psy_read_byte(ec, EC_LID_STATE, &status);
 		status &= EC_LID_OPEN;
+		gpiod_set_value(ec->lid_sta, !!status);
 		input_report_switch(ec->idev, SW_LID, !status);
 		input_sync(ec->idev);
 		break;
@@ -759,6 +770,11 @@ static int gaokun_ec_probe(struct i2c_client *client)
 	BLOCKING_INIT_NOTIFIER_HEAD(&ec->notifier_list);
 
 	/* Lid switch */
+	ec->lid_sta = devm_gpiod_get_optional(dev, "lid", GPIOD_OUT_HIGH);
+	if (IS_ERR(ec->lid_sta))
+		dev_err_probe(dev, PTR_ERR(ec->lid_sta),
+			      "Failed to get lid-gpios\n");
+
 	ec->idev = devm_input_allocate_device(dev);
 	if (!ec->idev)
 		return -ENOMEM;
