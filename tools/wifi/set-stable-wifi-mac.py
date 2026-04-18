@@ -61,6 +61,21 @@ def find_wifi_iface():
     return ""
 
 
+def resolve_iface(preferred):
+    candidates = []
+    if preferred:
+        candidates.append(preferred)
+
+    detected = find_wifi_iface()
+    if detected and detected not in candidates:
+        candidates.append(detected)
+
+    for name in candidates:
+        if pathlib.Path(f"/sys/class/net/{name}/address").exists():
+            return name
+    return ""
+
+
 def get_addr(iface):
     return pathlib.Path(f"/sys/class/net/{iface}/address").read_text().strip().lower()
 
@@ -106,10 +121,13 @@ def main():
         print("Error: must run as root", file=sys.stderr)
         return 1
 
-    iface = sys.argv[1] if len(sys.argv) > 1 else find_wifi_iface()
+    requested_iface = sys.argv[1] if len(sys.argv) > 1 else ""
+    iface = resolve_iface(requested_iface)
     if not iface:
         print("No Wi-Fi interface found, nothing to do.")
         return 0
+    if requested_iface and requested_iface != iface:
+        print(f"Wi-Fi interface {requested_iface} not present, using {iface} instead.")
 
     wanted = target_mac()
     current = get_addr(iface)

@@ -1,2 +1,2 @@
-ACTION=="add", SUBSYSTEM=="net", KERNEL=="wl*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="gaokun-wifi-mac@%k.service", RUN+="/usr/bin/systemctl start --no-block gaokun-wifi-mac@%k.service"
-ACTION=="add", SUBSYSTEM=="net", KERNEL=="wlan*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="gaokun-wifi-mac@%k.service", RUN+="/usr/bin/systemctl start --no-block gaokun-wifi-mac@%k.service"
+ACTION=="add", SUBSYSTEM=="net", KERNEL=="wl*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="gaokun-wifi-mac@%k.service"
+ACTION=="add", SUBSYSTEM=="net", KERNEL=="wlan*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="gaokun-wifi-mac@%k.service"

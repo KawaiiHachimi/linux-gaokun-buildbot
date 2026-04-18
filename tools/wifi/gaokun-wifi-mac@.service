@@ -1,8 +1,7 @@
 [Unit]
 Description=Set stable Wi-Fi MAC address for %I
 DefaultDependencies=no
-BindsTo=sys-subsystem-net-devices-%i.device
-After=sys-subsystem-net-devices-%i.device systemd-udevd.service
+After=systemd-udevd.service
 Before=NetworkManager.service network-pre.target
 Wants=systemd-udevd.service
 
@@ -11,6 +10,3 @@ Type=oneshot
 ExecStart=/usr/bin/python3 /usr/local/bin/set-stable-wifi-mac.py %I
 RemainAfterExit=yes
 TimeoutStartSec=30
-
-[Install]
-WantedBy=sys-subsystem-net-devices-%i.device
