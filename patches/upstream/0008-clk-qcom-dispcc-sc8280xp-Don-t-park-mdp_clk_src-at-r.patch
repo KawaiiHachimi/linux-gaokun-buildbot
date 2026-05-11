@@ -1,7 +1,7 @@
-From 530419082243a42c8f5324ddfdf9424ce2371969 Mon Sep 17 00:00:00 2001
+From 67e70c49c845bad2935de23a665eec98eeeaa314 Mon Sep 17 00:00:00 2001
 From: Pengyu Luo <mitltlatltl@gmail.com>
 Date: Tue, 3 Mar 2026 22:34:22 +0800
-Subject: [PATCH 04/16] clk: qcom: dispcc-sc8280xp: Don't park mdp_clk_src at
+Subject: [PATCH] clk: qcom: dispcc-sc8280xp: Don't park mdp_clk_src at
  registration time
 
 Parking disp{0,1}_cc_mdss_mdp_clk_src clk broke simplefb on HUAWEI
@@ -14,7 +14,7 @@ Signed-off-by: Pengyu Luo <mitltlatltl@gmail.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/clk/qcom/dispcc-sc8280xp.c b/drivers/clk/qcom/dispcc-sc8280xp.c
-index 5903a759d4af..9f3284efcbdd 100644
+index e91dfed0f..acc927c21 100644
 --- a/drivers/clk/qcom/dispcc-sc8280xp.c
 +++ b/drivers/clk/qcom/dispcc-sc8280xp.c
 @@ -977,7 +977,7 @@ static struct clk_rcg2 disp0_cc_mdss_mdp_clk_src = {
@@ -36,5 +36,5 @@ index 5903a759d4af..9f3284efcbdd 100644
  };
  
 -- 
-2.43.0
+2.53.0
 

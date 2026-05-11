@@ -1,7 +1,7 @@
-From 767d2110f2247a6e3e7b21565041770e8b2eb914 Mon Sep 17 00:00:00 2001
+From 70204bcf2c11c24213ea2899562e790759410867 Mon Sep 17 00:00:00 2001
 From: Konrad Dybcio <konrad.dybcio@linaro.org>
 Date: Tue, 25 Apr 2023 13:55:39 +0000
-Subject: [PATCH] arm64: dts: qcom: sc8280xp: Add Venus
+Subject: [PATCH 6/6] arm64: dts: qcom: sc8280xp: Add Venus
 
 Add the required nodes to enable Venus on sc8280xp.
 
@@ -13,7 +13,7 @@ Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
  1 file changed, 86 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/qcom/sc8280xp.dtsi b/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
-index d1bb89dbed59..43418398c3a1 100644
+index 60228990c..6f4fcd126 100644
 --- a/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
 +++ b/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
 @@ -11,6 +11,7 @@
@@ -22,9 +22,9 @@ index d1bb89dbed59..43418398c3a1 100644
  #include <dt-bindings/clock/qcom,sc8280xp-lpasscc.h>
 +#include <dt-bindings/clock/qcom,sm8350-videocc.h>
  #include <dt-bindings/dma/qcom-gpi.h>
+ #include <dt-bindings/firmware/qcom,scm.h>
  #include <dt-bindings/interconnect/qcom,osm-l3.h>
- #include <dt-bindings/interconnect/qcom,sc8280xp.h>
-@@ -692,6 +693,11 @@ reserved-region@85b00000 {
+@@ -698,6 +699,11 @@ reserved-region@85b00000 {
  			no-map;
  		};
  
@@ -36,7 +36,7 @@ index d1bb89dbed59..43418398c3a1 100644
  		pil_gpu_mem: gpu-mem@8bf00000 {
  			reg = <0 0x8bf00000 0 0x2000>;
  			no-map;
-@@ -4182,6 +4188,86 @@ usb_1_dwc3_ss: endpoint {
+@@ -4218,6 +4224,86 @@ usb_1_dwc3_ss: endpoint {
  			};
  		};
  
@@ -124,5 +124,5 @@ index d1bb89dbed59..43418398c3a1 100644
  			compatible = "qcom,sc8280xp-cci", "qcom,msm8996-cci";
  			reg = <0 0x0ac4a000 0 0x1000>;
 -- 
-2.43.0
+2.52.0
 

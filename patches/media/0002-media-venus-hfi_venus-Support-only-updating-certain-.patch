@@ -1,8 +1,8 @@
-From e4162c488ac76e2ab771237f67ac9808be5ea0b5 Mon Sep 17 00:00:00 2001
+From 5b5267596ed25465940c57babed6753e68e85b39 Mon Sep 17 00:00:00 2001
 From: Konrad Dybcio <konrad.dybcio@linaro.org>
 Date: Fri, 4 Aug 2023 22:09:10 +0200
-Subject: [PATCH] media: venus: hfi_venus: Support only updating certain bits
- with presets
+Subject: [PATCH 2/6] media: venus: hfi_venus: Support only updating certain
+ bits with presets
 
 On some platforms (like SM8350) we're expected to only touch certain bits
 (such as 0 and 4 corresponding to mask 0x11). Add support for doing so.
@@ -17,7 +17,7 @@ Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
  2 files changed, 13 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/media/platform/qcom/venus/core.h b/drivers/media/platform/qcom/venus/core.h
-index 7506f5d0f609..f680c74049a0 100644
+index 7506f5d0f..f680c7404 100644
 --- a/drivers/media/platform/qcom/venus/core.h
 +++ b/drivers/media/platform/qcom/venus/core.h
 @@ -40,6 +40,7 @@ struct freq_tbl {
@@ -29,7 +29,7 @@ index 7506f5d0f609..f680c74049a0 100644
  
  struct bw_tbl {
 diff --git a/drivers/media/platform/qcom/venus/hfi_venus.c b/drivers/media/platform/qcom/venus/hfi_venus.c
-index bd82066bb6e7..9f76a4fe5d6f 100644
+index bd82066bb..9f76a4fe5 100644
 --- a/drivers/media/platform/qcom/venus/hfi_venus.c
 +++ b/drivers/media/platform/qcom/venus/hfi_venus.c
 @@ -369,10 +369,19 @@ static void venus_set_registers(struct venus_hfi_device *hdev)
@@ -56,5 +56,5 @@ index bd82066bb6e7..9f76a4fe5d6f 100644
  
  static void venus_soft_int(struct venus_hfi_device *hdev)
 -- 
-2.43.0
+2.52.0
 

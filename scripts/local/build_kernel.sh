@@ -93,7 +93,10 @@ ensure_source_tree() {
     configure_git_identity
 
     echo "Applying standard gaokun3 patches..."
-    git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/*.patch
+    git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/upstream/*.patch
+    git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/others/*.patch
+    git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/media/*.patch
+    git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/0099-arm64-gaokun3-import-local-dts-and-defconfig.patch
 }
 
 el2_state() {

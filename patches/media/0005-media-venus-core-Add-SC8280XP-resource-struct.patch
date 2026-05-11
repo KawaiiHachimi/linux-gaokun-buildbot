@@ -1,7 +1,7 @@
-From c1c177727b58fbe89b4e0c3844692fc953c5fc75 Mon Sep 17 00:00:00 2001
+From 48192453d977ae69ca1d70d3657ffa1851738617 Mon Sep 17 00:00:00 2001
 From: Konrad Dybcio <konrad.dybcio@linaro.org>
 Date: Fri, 4 Aug 2023 22:09:13 +0200
-Subject: [PATCH] media: venus: core: Add SC8280XP resource struct
+Subject: [PATCH 5/6] media: venus: core: Add SC8280XP resource struct
 
 Add SC8280XP configuration data and related compatible.
 
@@ -15,7 +15,7 @@ Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
  1 file changed, 44 insertions(+)
 
 diff --git a/drivers/media/platform/qcom/venus/core.c b/drivers/media/platform/qcom/venus/core.c
-index 747f13442e93..71872ea8233a 100644
+index 747f13442..71872ea82 100644
 --- a/drivers/media/platform/qcom/venus/core.c
 +++ b/drivers/media/platform/qcom/venus/core.c
 @@ -1127,6 +1127,49 @@ static const struct venus_resources sc7280_res = {
@@ -77,5 +77,5 @@ index 747f13442e93..71872ea8233a 100644
  	{ .compatible = "qcom,sdm845-venus", .data = &sdm845_res },
  	{ .compatible = "qcom,sdm845-venus-v2", .data = &sdm845_res_v2 },
 -- 
-2.43.0
+2.52.0
 

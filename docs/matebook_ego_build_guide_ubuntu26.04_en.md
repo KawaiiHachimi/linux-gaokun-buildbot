@@ -87,7 +87,10 @@ cd $KERN_SRC
 # Apply project built-in patches
 git config user.name "local builder"
 git config user.email "builder@example.com"
-git am $GAOKUN_DIR/patches/*.patch
+git am $GAOKUN_DIR/patches/upstream/*.patch
+git am $GAOKUN_DIR/patches/others/*.patch
+git am $GAOKUN_DIR/patches/media/*.patch
+git am $GAOKUN_DIR/patches/0099-arm64-gaokun3-import-local-dts-and-defconfig.patch
 
 mkdir -p $KERN_OUT
 ccache -z

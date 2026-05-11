@@ -1,7 +1,7 @@
-From 8cdfa36d879adc4ed79a4cb6662eaa9dde6f1884 Mon Sep 17 00:00:00 2001
+From b2256e7996738bd1b3b29e1ad5849e287977ae86 Mon Sep 17 00:00:00 2001
 From: Konrad Dybcio <konrad.dybcio@linaro.org>
 Date: Fri, 4 Aug 2023 22:09:12 +0200
-Subject: [PATCH] media: venus: core: Add SM8350 resource struct
+Subject: [PATCH 4/6] media: venus: core: Add SM8350 resource struct
 
 Add SM8350 configuration data and related compatible.
 
@@ -14,7 +14,7 @@ Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
  1 file changed, 39 insertions(+)
 
 diff --git a/drivers/media/platform/qcom/venus/core.c b/drivers/media/platform/qcom/venus/core.c
-index 1f42792f0338..747f13442e93 100644
+index 1f42792f0..747f13442 100644
 --- a/drivers/media/platform/qcom/venus/core.c
 +++ b/drivers/media/platform/qcom/venus/core.c
 @@ -1025,6 +1025,44 @@ static const struct venus_resources sm8250_res = {
@@ -71,5 +71,5 @@ index 1f42792f0338..747f13442e93 100644
  };
  MODULE_DEVICE_TABLE(of, venus_dt_match);
 -- 
-2.43.0
+2.52.0
 

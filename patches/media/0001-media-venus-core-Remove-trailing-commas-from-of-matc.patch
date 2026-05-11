@@ -1,7 +1,7 @@
-From e375d916df946623f751a0611004b9a8c8a72194 Mon Sep 17 00:00:00 2001
+From 74918b87f1c2db9b722d73b2901c3d74464d2ae8 Mon Sep 17 00:00:00 2001
 From: Konrad Dybcio <konrad.dybcio@linaro.org>
 Date: Fri, 4 Aug 2023 22:09:09 +0200
-Subject: [PATCH] media: venus: core: Remove trailing commas from of match
+Subject: [PATCH 1/6] media: venus: core: Remove trailing commas from of match
  entries
 
 Even though it has zero effect on functionality, remove them for coherency
@@ -16,7 +16,7 @@ Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
  1 file changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/media/platform/qcom/venus/core.c b/drivers/media/platform/qcom/venus/core.c
-index 7e639760c41d..67b69a3c581f 100644
+index 7e639760c..67b69a3c5 100644
 --- a/drivers/media/platform/qcom/venus/core.c
 +++ b/drivers/media/platform/qcom/venus/core.c
 @@ -1120,17 +1120,17 @@ static const struct venus_resources qcm2290_res = {
@@ -49,5 +49,5 @@ index 7e639760c41d..67b69a3c581f 100644
  MODULE_DEVICE_TABLE(of, venus_dt_match);
  
 -- 
-2.43.0
+2.52.0
 

@@ -1,7 +1,7 @@
-From 752d9c9b19fb89760fab8efaa1a2bbb45a09f8ee Mon Sep 17 00:00:00 2001
+From ae8cf966385445e23e171ae9f67eaa78cb56ae68 Mon Sep 17 00:00:00 2001
 From: Pengyu Luo <mitltlatltl@gmail.com>
 Date: Fri, 3 Apr 2026 19:53:54 +0800
-Subject: [PATCH 09/16] arm64: dts: qcom: sc8280xp: Add ADSP FastRPC node
+Subject: [PATCH] arm64: dts: qcom: sc8280xp: Add ADSP FastRPC node
 
 Add the FastRPC node to enable offloading compute tasks to the ADSP
 via the FastRPC framework.
@@ -12,7 +12,7 @@ Signed-off-by: Pengyu Luo <mitltlatltl@gmail.com>
  1 file changed, 27 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/qcom/sc8280xp.dtsi b/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
-index d1bb89dbed59..fa5246846a12 100644
+index 761f229e8f47..ee02acd18856 100644
 --- a/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
 +++ b/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
 @@ -2966,6 +2966,33 @@ IPCC_MPROC_SIGNAL_GLINK_QMP
@@ -50,5 +50,5 @@ index d1bb89dbed59..fa5246846a12 100644
  					compatible = "qcom,gpr";
  					qcom,glink-channels = "adsp_apps";
 -- 
-2.43.0
+2.53.0
 

@@ -1,4 +1,4 @@
-From cadaa64d0a036476c4e6deac0e7213224ef66224 Mon Sep 17 00:00:00 2001
+From 2bd3fcba943b756ba46230a4cdb7ad0fe7481c07 Mon Sep 17 00:00:00 2001
 From: Pengyu Luo <mitltlatltl@gmail.com>
 Date: Sun, 19 Apr 2026 06:48:59 +0800
 Subject: [PATCH] arm64: dts: qcom: sc8280xp: Add memory-region for audio PD
@@ -14,18 +14,18 @@ Link: https://lore.kernel.org/linux-arm-msm/20260418-talosaudio-v1-1-585ab22faaf
  1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/boot/dts/qcom/sc8280xp.dtsi b/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
-index 7afb0bb14..575b8a0f6 100644
+index ee02acd18856..8d526ffede36 100644
 --- a/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
 +++ b/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
-@@ -13,6 +13,7 @@
+@@ -12,6 +12,7 @@
+ #include <dt-bindings/clock/qcom,sc8280xp-camcc.h>
  #include <dt-bindings/clock/qcom,sc8280xp-lpasscc.h>
- #include <dt-bindings/clock/qcom,sm8350-videocc.h>
  #include <dt-bindings/dma/qcom-gpi.h>
 +#include <dt-bindings/firmware/qcom,scm.h>
  #include <dt-bindings/interconnect/qcom,osm-l3.h>
  #include <dt-bindings/interconnect/qcom,sc8280xp.h>
  #include <dt-bindings/interrupt-controller/arm-gic.h>
-@@ -684,7 +685,12 @@ reserved-region@80b00000 {
+@@ -683,7 +684,12 @@ reserved-region@80b00000 {
  		};
  
  		reserved-region@83b00000 {
@@ -39,7 +39,7 @@ index 7afb0bb14..575b8a0f6 100644
  			no-map;
  		};
  
-@@ -2977,6 +2983,9 @@ fastrpc {
+@@ -2971,6 +2977,9 @@ fastrpc {
  					qcom,glink-channels = "fastrpcglink-apps-dsp";
  					label = "adsp";
  					qcom,non-secure-domain;
@@ -50,5 +50,5 @@ index 7afb0bb14..575b8a0f6 100644
  					#size-cells = <0>;
  
 -- 
-2.43.0
+2.53.0
 
