@@ -1,7 +1,7 @@
-From b636390249939606c00b2bdd08700cd1c72ef93b Mon Sep 17 00:00:00 2001
+From 479d36dc37ed37c3122106b7ac93f25149c3aef2 Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan@gerhold.net>
 Date: Wed, 30 Jul 2025 16:35:46 +0200
-Subject: [PATCH 17/24] wip: remoteproc: qcom_q6v5_pas: Avoid using broken
+Subject: [PATCH 16/22] wip: remoteproc: qcom_q6v5_pas: Avoid using broken
  reset when running bare-metal
 
 Some firmware versions have a split design where firmware authentication is
@@ -30,7 +30,7 @@ Signed-off-by: Stephan Gerhold <stephan@gerhold.net>
  1 file changed, 29 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/remoteproc/qcom_q6v5_pas.c b/drivers/remoteproc/qcom_q6v5_pas.c
-index a84745add654..38178e8a764f 100644
+index 5be115a10..a44026aca 100644
 --- a/drivers/remoteproc/qcom_q6v5_pas.c
 +++ b/drivers/remoteproc/qcom_q6v5_pas.c
 @@ -567,6 +567,13 @@ static const struct rproc_ops qcom_pas_minidump_ops = {
@@ -116,5 +116,5 @@ index a84745add654..38178e8a764f 100644
  
  	qcom_q6v5_deinit(&pas->q6v5);
 -- 
-2.43.0
+2.52.0
 

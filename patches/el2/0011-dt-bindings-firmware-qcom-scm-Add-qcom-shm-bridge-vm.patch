@@ -1,7 +1,7 @@
-From 4e73c5c01f827af0dc25d407da91d4d6338b6eca Mon Sep 17 00:00:00 2001
+From 75c256c1e5acaf45e1d0d9c39ef415b52d09fd45 Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan@gerhold.net>
 Date: Sun, 26 Oct 2025 14:50:30 +0100
-Subject: [PATCH 12/24] dt-bindings: firmware: qcom,scm: Add
+Subject: [PATCH 11/22] dt-bindings: firmware: qcom,scm: Add
  qcom,shm-bridge-vmid
 
 Signed-off-by: Stephan Gerhold <stephan@gerhold.net>
@@ -11,10 +11,10 @@ Signed-off-by: Stephan Gerhold <stephan@gerhold.net>
  2 files changed, 11 insertions(+)
 
 diff --git a/Documentation/devicetree/bindings/firmware/qcom,scm.yaml b/Documentation/devicetree/bindings/firmware/qcom,scm.yaml
-index d66459f1d84e..bf75cc9a375b 100644
+index 7918d31f5..d031069d7 100644
 --- a/Documentation/devicetree/bindings/firmware/qcom,scm.yaml
 +++ b/Documentation/devicetree/bindings/firmware/qcom,scm.yaml
-@@ -108,6 +108,14 @@ properties:
+@@ -111,6 +111,14 @@ properties:
        Phandle to the memory region reserved for the shared memory bridge to TZ.
      maxItems: 1
  
@@ -30,7 +30,7 @@ index d66459f1d84e..bf75cc9a375b 100644
      description:
        Indicates that the SDI (Secure Debug Image) has been enabled by TZ
 diff --git a/include/dt-bindings/firmware/qcom,scm.h b/include/dt-bindings/firmware/qcom,scm.h
-index 6de8b08e1e79..1e0a477f0db9 100644
+index 6de8b08e1..1e0a477f0 100644
 --- a/include/dt-bindings/firmware/qcom,scm.h
 +++ b/include/dt-bindings/firmware/qcom,scm.h
 @@ -36,4 +36,7 @@
@@ -42,5 +42,5 @@ index 6de8b08e1e79..1e0a477f0db9 100644
 +
  #endif
 -- 
-2.43.0
+2.52.0
 

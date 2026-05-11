@@ -1,7 +1,7 @@
-From 16295fac26e948dc4e9b0156e7c5d5c3e8b460e9 Mon Sep 17 00:00:00 2001
+From 507e99da789c5afef2bb61f127682f3491d47dd1 Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan.gerhold@linaro.org>
 Date: Tue, 5 Aug 2025 17:44:32 +0200
-Subject: [PATCH 09/24] remoteproc: qcom_q6v5: Add qcom_q6v5_attach()
+Subject: [PATCH 08/22] remoteproc: qcom_q6v5: Add qcom_q6v5_attach()
 
 Implement qcom_q6v5_attach(), which can be used by q6v5 remoteproc drivers
 to attach to a remoteproc that is already running during boot. It is
@@ -15,7 +15,7 @@ Signed-off-by: Stephan Gerhold <stephan.gerhold@linaro.org>
  2 files changed, 38 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/remoteproc/qcom_q6v5.c b/drivers/remoteproc/qcom_q6v5.c
-index d4d978cca4ba..94c75d9cca55 100644
+index d4d978cca..94c75d9cc 100644
 --- a/drivers/remoteproc/qcom_q6v5.c
 +++ b/drivers/remoteproc/qcom_q6v5.c
 @@ -36,6 +36,25 @@ static int q6v5_load_state_toggle(struct qcom_q6v5 *q6v5, bool enable)
@@ -87,7 +87,7 @@ index d4d978cca4ba..94c75d9cca55 100644
  /**
   * qcom_q6v5_unprepare() - unprepare the qcom_q6v5 context after stop
 diff --git a/drivers/remoteproc/qcom_q6v5.h b/drivers/remoteproc/qcom_q6v5.h
-index 59970adb04b1..f034bb628605 100644
+index 59970adb0..f034bb628 100644
 --- a/drivers/remoteproc/qcom_q6v5.h
 +++ b/drivers/remoteproc/qcom_q6v5.h
 @@ -50,6 +50,7 @@ void qcom_q6v5_deinit(struct qcom_q6v5 *q6v5);
@@ -99,5 +99,5 @@ index 59970adb04b1..f034bb628605 100644
  int qcom_q6v5_request_stop(struct qcom_q6v5 *q6v5, struct qcom_sysmon *sysmon);
  int qcom_q6v5_wait_for_start(struct qcom_q6v5 *q6v5, int timeout);
 -- 
-2.43.0
+2.52.0
 

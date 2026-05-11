@@ -1,7 +1,7 @@
-From 357f326b9eea3b5cfbce3978c12cc9cc079286a3 Mon Sep 17 00:00:00 2001
+From db9a19d9a53779af66b7d816a2c0974c1a50b9e6 Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan.gerhold@linaro.org>
 Date: Fri, 25 Jul 2025 12:21:04 +0200
-Subject: [PATCH 03/24] soc: qcom: smp2p: Use length limited strncmp() for
+Subject: [PATCH 03/22] soc: qcom: smp2p: Use length limited strncmp() for
  comparing entry names
 
 A rogue (or broken) remoteproc might not null-terminate its entry names.
@@ -15,10 +15,10 @@ Signed-off-by: Stephan Gerhold <stephan.gerhold@linaro.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/soc/qcom/smp2p.c b/drivers/soc/qcom/smp2p.c
-index 876648d0b58e..dcf222b1907d 100644
+index a0562663b..1c0b16b8a 100644
 --- a/drivers/soc/qcom/smp2p.c
 +++ b/drivers/soc/qcom/smp2p.c
-@@ -238,7 +238,7 @@ static void qcom_smp2p_notify_in(struct qcom_smp2p *smp2p)
+@@ -301,7 +301,7 @@ static void qcom_smp2p_notify_in(struct qcom_smp2p *smp2p)
  	for (i = smp2p->valid_entries; i < in->valid_entries; i++) {
  		list_for_each_entry(entry, &smp2p->inbound, node) {
  			memcpy(buf, in->entries[i].name, sizeof(buf));
@@ -28,5 +28,5 @@ index 876648d0b58e..dcf222b1907d 100644
  				break;
  			}
 -- 
-2.43.0
+2.52.0
 

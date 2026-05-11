@@ -1,7 +1,7 @@
-From 0c0ab479435dafd626a1ccdada199841ff325717 Mon Sep 17 00:00:00 2001
+From 4f231ff31562aeff74c2e71df3d0820167dff6b6 Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan.gerhold@linaro.org>
 Date: Sat, 1 Nov 2025 18:33:26 +0100
-Subject: [PATCH 23/24] rpmsg: core: Make it easier to manually create endpoint
+Subject: [PATCH 21/22] rpmsg: core: Make it easier to manually create endpoint
  during probe()
 
 Currently, the rpmsg core automatically creates an endpoint for rpmsg
@@ -39,7 +39,7 @@ Signed-off-by: Stephan Gerhold <stephan.gerhold@linaro.org>
  2 files changed, 49 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/rpmsg/rpmsg_core.c b/drivers/rpmsg/rpmsg_core.c
-index e23a024856ee..51723e55bde1 100644
+index 6783d04b5..896fb8a3a 100644
 --- a/drivers/rpmsg/rpmsg_core.c
 +++ b/drivers/rpmsg/rpmsg_core.c
 @@ -95,6 +95,14 @@ EXPORT_SYMBOL(rpmsg_release_channel);
@@ -140,7 +140,7 @@ index e23a024856ee..51723e55bde1 100644
  }
  
 diff --git a/include/linux/rpmsg.h b/include/linux/rpmsg.h
-index fb7ab9165645..8cf3fa83fa95 100644
+index 83266ce14..c37197035 100644
 --- a/include/linux/rpmsg.h
 +++ b/include/linux/rpmsg.h
 @@ -181,6 +181,8 @@ void rpmsg_destroy_ept(struct rpmsg_endpoint *);
@@ -150,8 +150,8 @@ index fb7ab9165645..8cf3fa83fa95 100644
 +struct rpmsg_endpoint *rpmsg_dev_open_ept(struct rpmsg_device *rpdev,
 +					  rpmsg_rx_cb_t cb, void *priv);
  
- int rpmsg_send(struct rpmsg_endpoint *ept, void *data, int len);
- int rpmsg_sendto(struct rpmsg_endpoint *ept, void *data, int len, u32 dst);
+ int rpmsg_send(struct rpmsg_endpoint *ept, const void *data, int len);
+ int rpmsg_sendto(struct rpmsg_endpoint *ept, const void *data, int len, u32 dst);
 @@ -249,6 +251,16 @@ static inline struct rpmsg_endpoint *rpmsg_create_ept(struct rpmsg_device *rpdev
  	return NULL;
  }
@@ -166,9 +166,9 @@ index fb7ab9165645..8cf3fa83fa95 100644
 +	return NULL;
 +}
 +
- static inline int rpmsg_send(struct rpmsg_endpoint *ept, void *data, int len)
+ static inline int rpmsg_send(struct rpmsg_endpoint *ept, const void *data, int len)
  {
  	/* This shouldn't be possible */
 -- 
-2.43.0
+2.52.0
 

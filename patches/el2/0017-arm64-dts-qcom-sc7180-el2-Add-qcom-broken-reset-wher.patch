@@ -1,7 +1,7 @@
-From 9fea1eab7c56f846ac02badc4def48df07c628aa Mon Sep 17 00:00:00 2001
+From 900dc5fc2b3e327640f235a98f531b07de6a5c33 Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan@gerhold.net>
 Date: Wed, 30 Jul 2025 16:17:46 +0200
-Subject: [PATCH 18/24] arm64: dts: qcom: sc7180-el2: Add qcom,broken-reset
+Subject: [PATCH 17/22] arm64: dts: qcom: sc7180-el2: Add qcom,broken-reset
  where needed
 
 The remoteproc PAS firmware interface does not work properly when running
@@ -19,7 +19,7 @@ Signed-off-by: Stephan Gerhold <stephan@gerhold.net>
  1 file changed, 8 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/qcom/sc7180-el2.dtso b/arch/arm64/boot/dts/qcom/sc7180-el2.dtso
-index fe9c763b055c..ecb6327cb522 100644
+index fe9c763b0..ecb6327cb 100644
 --- a/arch/arm64/boot/dts/qcom/sc7180-el2.dtso
 +++ b/arch/arm64/boot/dts/qcom/sc7180-el2.dtso
 @@ -13,6 +13,14 @@ &gpu_zap_shader {
@@ -38,5 +38,5 @@ index fe9c763b055c..ecb6327cb522 100644
  	qcom,shm-bridge-vmid = <QCOM_SCM_VMID_SELF_OWNER>;
  };
 -- 
-2.43.0
+2.52.0
 

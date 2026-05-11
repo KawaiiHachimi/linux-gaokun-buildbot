@@ -1,7 +1,7 @@
-From d3e7469f02e940d2524ccb6d21920415c7fbe596 Mon Sep 17 00:00:00 2001
+From 44707a355f55f2c535e9b85de4fdba8147f4c7b6 Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan.gerhold@linaro.org>
 Date: Sat, 1 Nov 2025 18:32:25 +0100
-Subject: [PATCH 22/24] rpmsg: core: Call announce_destroy() only after
+Subject: [PATCH 20/22] rpmsg: core: Call announce_destroy() only after
  announce_create()
 
 rpmsg_dev_probe() calls rpdev->ops->announce_create() only when the driver
@@ -17,7 +17,7 @@ Signed-off-by: Stephan Gerhold <stephan.gerhold@linaro.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/rpmsg/rpmsg_core.c b/drivers/rpmsg/rpmsg_core.c
-index 96964745065b..e23a024856ee 100644
+index e7f7831d3..6783d04b5 100644
 --- a/drivers/rpmsg/rpmsg_core.c
 +++ b/drivers/rpmsg/rpmsg_core.c
 @@ -521,7 +521,7 @@ static void rpmsg_dev_remove(struct device *dev)
@@ -30,5 +30,5 @@ index 96964745065b..e23a024856ee 100644
  
  	if (rpdrv->remove)
 -- 
-2.43.0
+2.52.0
 

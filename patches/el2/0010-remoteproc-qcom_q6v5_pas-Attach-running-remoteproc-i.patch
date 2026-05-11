@@ -1,7 +1,7 @@
-From 729253961bf5e787e8475067fbe25282eb972bf1 Mon Sep 17 00:00:00 2001
+From 7a5f383c491b2b676277a37885f8f4334ed6cb0b Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan.gerhold@linaro.org>
 Date: Tue, 5 Aug 2025 17:44:32 +0200
-Subject: [PATCH 11/24] remoteproc: qcom_q6v5_pas: Attach running remoteproc if
+Subject: [PATCH 10/22] remoteproc: qcom_q6v5_pas: Attach running remoteproc if
  firmware is missing
 
 A remoteproc might be already running during boot, e.g. because it was
@@ -33,7 +33,7 @@ Signed-off-by: Stephan Gerhold <stephan.gerhold@linaro.org>
  1 file changed, 54 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/remoteproc/qcom_q6v5_pas.c b/drivers/remoteproc/qcom_q6v5_pas.c
-index c05eed8097ef..a84745add654 100644
+index 1327e1875..5be115a10 100644
 --- a/drivers/remoteproc/qcom_q6v5_pas.c
 +++ b/drivers/remoteproc/qcom_q6v5_pas.c
 @@ -227,10 +227,13 @@ static int qcom_pas_load(struct rproc *rproc, const struct firmware *fw)
@@ -171,5 +171,5 @@ index c05eed8097ef..a84745add654 100644
  	qcom_add_smd_subdev(rproc, &pas->smd_subdev);
  	qcom_add_pdm_subdev(rproc, &pas->pdm_subdev);
 -- 
-2.43.0
+2.52.0
 

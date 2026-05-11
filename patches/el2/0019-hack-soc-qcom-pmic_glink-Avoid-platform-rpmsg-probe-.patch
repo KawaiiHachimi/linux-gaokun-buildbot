@@ -1,7 +1,7 @@
-From 39aa47f538b739e966e4c6eab629ab3f2eacbd2b Mon Sep 17 00:00:00 2001
+From 0f4636fa4813490546846c9a76025cd70e4509e7 Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan.gerhold@linaro.org>
 Date: Wed, 8 Oct 2025 12:28:36 +0200
-Subject: [PATCH 21/24] hack: soc: qcom: pmic_glink: Avoid platform/rpmsg probe
+Subject: [PATCH 19/22] hack: soc: qcom: pmic_glink: Avoid platform/rpmsg probe
  race condition
 
 If the rpmsg device probes before the platform device, PMIC GLINK setup
@@ -23,10 +23,10 @@ This needs more investigation.
  1 file changed, 13 insertions(+), 25 deletions(-)
 
 diff --git a/drivers/soc/qcom/pmic_glink.c b/drivers/soc/qcom/pmic_glink.c
-index 627f96ca322e..c073d7e2ede6 100644
+index 304226157..d6faffad8 100644
 --- a/drivers/soc/qcom/pmic_glink.c
 +++ b/drivers/soc/qcom/pmic_glink.c
-@@ -349,8 +349,18 @@ static int pmic_glink_probe(struct platform_device *pdev)
+@@ -355,8 +355,18 @@ static int pmic_glink_probe(struct platform_device *pdev)
  	__pmic_glink = pg;
  	mutex_unlock(&__pmic_glink_lock);
  
@@ -43,18 +43,18 @@ index 627f96ca322e..c073d7e2ede6 100644
 +	__pmic_glink = NULL;
 +	mutex_unlock(&__pmic_glink_lock);
  out_release_aux_devices:
- 	if (pg->client_mask & BIT(PMIC_GLINK_CLIENT_BATT))
+ 	if (pg->data->client_mask & BIT(PMIC_GLINK_CLIENT_BATT))
  		pmic_glink_del_aux_device(pg, &pg->ps_aux);
-@@ -379,6 +389,8 @@ static void pmic_glink_remove(struct platform_device *pdev)
- 	if (pg->client_mask & BIT(PMIC_GLINK_CLIENT_UCSI))
+@@ -385,6 +395,8 @@ static void pmic_glink_remove(struct platform_device *pdev)
+ 	if (pg->data->client_mask & BIT(PMIC_GLINK_CLIENT_UCSI))
  		pmic_glink_del_aux_device(pg, &pg->ucsi_aux);
  
 +	unregister_rpmsg_driver(&pmic_glink_rpmsg_driver);
-+
++	
  	guard(mutex)(&__pmic_glink_lock);
  	__pmic_glink = NULL;
  }
-@@ -401,31 +413,7 @@ static struct platform_driver pmic_glink_driver = {
+@@ -419,31 +431,7 @@ static struct platform_driver pmic_glink_driver = {
  		.of_match_table = pmic_glink_of_match,
  	},
  };
@@ -88,5 +88,5 @@ index 627f96ca322e..c073d7e2ede6 100644
  MODULE_DESCRIPTION("Qualcomm PMIC GLINK driver");
  MODULE_LICENSE("GPL");
 -- 
-2.43.0
+2.52.0
 

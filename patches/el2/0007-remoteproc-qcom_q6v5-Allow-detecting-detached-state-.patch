@@ -1,7 +1,7 @@
-From 1b44b3a05be31efecd2b39f1609f7732147cdb8a Mon Sep 17 00:00:00 2001
+From 382fbda881803410b2cb87dda41fb60c6bd1841b Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan.gerhold@linaro.org>
 Date: Tue, 5 Aug 2025 17:44:32 +0200
-Subject: [PATCH 08/24] remoteproc: qcom_q6v5: Allow detecting detached state
+Subject: [PATCH 07/22] remoteproc: qcom_q6v5: Allow detecting detached state
  during boot
 
 A remoteproc might be already running during boot, e.g. because it was
@@ -27,7 +27,7 @@ Signed-off-by: Stephan Gerhold <stephan.gerhold@linaro.org>
  2 files changed, 31 insertions(+)
 
 diff --git a/drivers/remoteproc/qcom_q6v5.c b/drivers/remoteproc/qcom_q6v5.c
-index 58d5b85e58cd..d4d978cca4ba 100644
+index 58d5b85e5..d4d978cca 100644
 --- a/drivers/remoteproc/qcom_q6v5.c
 +++ b/drivers/remoteproc/qcom_q6v5.c
 @@ -234,6 +234,35 @@ unsigned long qcom_q6v5_panic(struct qcom_q6v5 *q6v5)
@@ -67,7 +67,7 @@ index 58d5b85e58cd..d4d978cca4ba 100644
   * qcom_q6v5_init() - initializer of the q6v5 common struct
   * @q6v5:	handle to be initialized
 diff --git a/drivers/remoteproc/qcom_q6v5.h b/drivers/remoteproc/qcom_q6v5.h
-index 5a859c41896e..59970adb04b1 100644
+index 5a859c418..59970adb0 100644
 --- a/drivers/remoteproc/qcom_q6v5.h
 +++ b/drivers/remoteproc/qcom_q6v5.h
 @@ -47,6 +47,8 @@ int qcom_q6v5_init(struct qcom_q6v5 *q6v5, struct platform_device *pdev,
@@ -80,5 +80,5 @@ index 5a859c41896e..59970adb04b1 100644
  int qcom_q6v5_unprepare(struct qcom_q6v5 *q6v5);
  int qcom_q6v5_request_stop(struct qcom_q6v5 *q6v5, struct qcom_sysmon *sysmon);
 -- 
-2.43.0
+2.52.0
 

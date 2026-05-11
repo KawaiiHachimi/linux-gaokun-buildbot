@@ -1,7 +1,7 @@
-From b7ef6686896212fbc1edb00e66b210309aee9667 Mon Sep 17 00:00:00 2001
+From 817f5f3c28a61806a13b34fa931471acd9f106d2 Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan.gerhold@linaro.org>
 Date: Tue, 5 Aug 2025 17:44:32 +0200
-Subject: [PATCH 10/24] remoteproc: qcom_q6v5: Send SMP2P stop signal in
+Subject: [PATCH 09/22] remoteproc: qcom_q6v5: Send SMP2P stop signal in
  attached/detached state
 
 If we stop the q6v5 remoteproc while it is in RPROC_ATTACHED or
@@ -20,7 +20,7 @@ Signed-off-by: Stephan Gerhold <stephan.gerhold@linaro.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/remoteproc/qcom_q6v5.c b/drivers/remoteproc/qcom_q6v5.c
-index 94c75d9cca55..ed1b578a831d 100644
+index 94c75d9cc..ed1b578a8 100644
 --- a/drivers/remoteproc/qcom_q6v5.c
 +++ b/drivers/remoteproc/qcom_q6v5.c
 @@ -231,8 +231,8 @@ int qcom_q6v5_request_stop(struct qcom_q6v5 *q6v5, struct qcom_sysmon *sysmon)
@@ -35,5 +35,5 @@ index 94c75d9cca55..ed1b578a831d 100644
  
  	qcom_smem_state_update_bits(q6v5->state,
 -- 
-2.43.0
+2.52.0
 

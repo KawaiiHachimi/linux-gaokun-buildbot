@@ -1,7 +1,7 @@
-From 48fb65528275bee6850323ec07cd1057a4e61947 Mon Sep 17 00:00:00 2001
+From def6b3d283c096ad321ba2c2da2d8d3e6153675f Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan.gerhold@linaro.org>
 Date: Sat, 1 Nov 2025 18:33:53 +0100
-Subject: [PATCH 24/24] net: qrtr: smd: Fix race conditions while
+Subject: [PATCH 22/22] net: qrtr: smd: Fix race conditions while
  opening/closing channel
 
 If rpmsg drivers specify a receive callback in the rpmsg_driver struct, the
@@ -72,7 +72,7 @@ Signed-off-by: Stephan Gerhold <stephan.gerhold@linaro.org>
  1 file changed, 32 insertions(+), 9 deletions(-)
 
 diff --git a/net/qrtr/smd.c b/net/qrtr/smd.c
-index c91bf030fbc7..bd70dcfe499a 100644
+index c91bf030f..bd70dcfe4 100644
 --- a/net/qrtr/smd.c
 +++ b/net/qrtr/smd.c
 @@ -5,6 +5,7 @@
@@ -176,5 +176,5 @@ index c91bf030fbc7..bd70dcfe499a 100644
  	.drv = {
  		.name = "qcom_smd_qrtr",
 -- 
-2.43.0
+2.52.0
 

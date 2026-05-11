@@ -1,7 +1,7 @@
-From bd3feba340970b22ca517196dfb971f663e42214 Mon Sep 17 00:00:00 2001
+From accbbf79bcf0154931c293c787539985b5dcd9c3 Mon Sep 17 00:00:00 2001
 From: Stephan Gerhold <stephan.gerhold@linaro.org>
 Date: Sun, 20 Jul 2025 16:15:54 +0200
-Subject: [PATCH 13/24] wip: firmware: qcom: tzmem: Use "self owner" bits when
+Subject: [PATCH 12/22] wip: firmware: qcom: tzmem: Use "self owner" bits when
  running in EL2
 
 It seems like the SHM bridge needs to use a different set of bits (the
@@ -23,7 +23,7 @@ Signed-off-by: Stephan Gerhold <stephan@gerhold.net>
  1 file changed, 21 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/firmware/qcom/qcom_tzmem.c b/drivers/firmware/qcom/qcom_tzmem.c
-index 0635cbeacfc8..d800c29c325b 100644
+index 0635cbeac..d800c29c3 100644
 --- a/drivers/firmware/qcom/qcom_tzmem.c
 +++ b/drivers/firmware/qcom/qcom_tzmem.c
 @@ -71,9 +71,12 @@ static void qcom_tzmem_cleanup_area(struct qcom_tzmem_area *area)
@@ -85,5 +85,5 @@ index 0635cbeacfc8..d800c29c325b 100644
  		dev_err(qcom_tzmem_dev,
  			"SHM Bridge failed: ret %d paddr 0x%pa, size %zu\n",
 -- 
-2.43.0
+2.52.0
 
