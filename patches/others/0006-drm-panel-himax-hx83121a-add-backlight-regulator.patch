@@ -1,0 +1,24 @@
+From 8f64d0f2dfb7ed5765af3345e6ef13cf9964f2af Mon Sep 17 00:00:00 2001
+From: Pengyu Luo <mitltlatltl@gmail.com>
+Date: Tue, 12 May 2026 19:03:26 +0000
+Subject: [PATCH] drm/panel: himax-hx83121a: add backlight regulator
+
+---
+ drivers/gpu/drm/panel/panel-himax-hx83121a.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/gpu/drm/panel/panel-himax-hx83121a.c b/drivers/gpu/drm/panel/panel-himax-hx83121a.c
+index ebfa14080..028b615c6 100644
+--- a/drivers/gpu/drm/panel/panel-himax-hx83121a.c
++++ b/drivers/gpu/drm/panel/panel-himax-hx83121a.c
+@@ -62,6 +62,7 @@ static const struct regulator_bulk_data himax_supplies[] = {
+ 	{ .supply = "vddi" },
+ 	{ .supply = "avdd" },
+ 	{ .supply = "avee" },
++	{ .supply = "bl" },
+ };
+ 
+ static inline struct himax *to_himax(struct drm_panel *panel)
+-- 
+2.52.0
+
