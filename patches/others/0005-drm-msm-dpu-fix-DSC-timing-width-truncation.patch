@@ -1,0 +1,53 @@
+From a69d4e17cfd05956f433d12908b34713af246564 Mon Sep 17 00:00:00 2001
+From: Lewis White <whitelewis@matebook-e-go>
+Date: Tue, 12 May 2026 17:58:36 +0000
+Subject: [PATCH] drm/msm/dpu: fix DSC timing width truncation
+
+When programming DSI video timing with DSC enabled, derive the compressed
+timing width from dce_bytes_per_line and round it up to the number of
+source-pixel clocks required for the line.
+
+This keeps the DPU timing generator aligned with the DSI host timing
+calculation for cases where the compressed width is fractional. For example,
+800 pixels at 8 bpp over 8 bpc requires 267 clocks rather than the truncated
+266.
+
+Signed-off-by: Lewis White <whitelewis@matebook-e-go>
+Signed-off-by: KawaiiHachimi <bilibili@att.net>
+---
+ drivers/gpu/drm/msm/disp/dpu1/dpu_encoder_phys_vid.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/gpu/drm/msm/disp/dpu1/dpu_encoder_phys_vid.c b/drivers/gpu/drm/msm/disp/dpu1/dpu_encoder_phys_vid.c
+index ba810f26e..7a8d1136f 100644
+--- a/drivers/gpu/drm/msm/disp/dpu1/dpu_encoder_phys_vid.c
++++ b/drivers/gpu/drm/msm/disp/dpu1/dpu_encoder_phys_vid.c
+@@ -12,7 +12,6 @@
+ #include "disp/msm_disp_snapshot.h"
+ #include "msm_dsc_helper.h"
+ 
+-#include <drm/display/drm_dsc_helper.h>
+ #include <drm/drm_managed.h>
+ 
+ #define DPU_DEBUG_VIDENC(e, fmt, ...) DPU_DEBUG("enc%d intf%d " fmt, \
+@@ -130,14 +129,10 @@ static void drm_mode_to_intf_timing_params(
+ 	if (phys_enc->hw_intf->cap->type != INTF_DP && timing->compression_en) {
+ 		struct drm_dsc_config *dsc =
+ 		       dpu_encoder_get_dsc_config(phys_enc->parent);
+-		/*
+-		 * TODO: replace drm_dsc_get_bpp_int with logic to handle
+-		 * fractional part if there is fraction
+-		 */
+-		timing->width = timing->width * drm_dsc_get_bpp_int(dsc) /
+-				(dsc->bits_per_component * 3);
+-		timing->xres = timing->width;
+ 		timing->dce_bytes_per_line = msm_dsc_get_bytes_per_line(dsc);
++		timing->width = DIV_ROUND_UP(timing->dce_bytes_per_line * 8,
++					     dsc->bits_per_component * 3);
++		timing->xres = timing->width;
+ 	}
+ }
+ 
+-- 
+2.52.0
+
