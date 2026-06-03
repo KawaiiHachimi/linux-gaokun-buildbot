@@ -5,9 +5,9 @@ Subject: [PATCH] arm64: gaokun3: import local dts and defconfig
 
 ---
  .../qcom/sc8280xp-huawei-gaokun3-camera.dtsi  | 307 +++++++++++
- .../boot/dts/qcom/sc8280xp-huawei-gaokun3.dts | 420 +++++++++++---
- arch/arm64/configs/gaokun3_defconfig          | 511 ++++++++++++++++++
- 3 files changed, 1149 insertions(+), 89 deletions(-)
+ .../boot/dts/qcom/sc8280xp-huawei-gaokun3.dts | 421 +++++++++++---
+ arch/arm64/configs/gaokun3_defconfig          | 512 ++++++++++++++++++
+ 3 files changed, 1150 insertions(+), 89 deletions(-)
  create mode 100644 arch/arm64/boot/dts/qcom/sc8280xp-huawei-gaokun3-camera.dtsi
  create mode 100644 arch/arm64/configs/gaokun3_defconfig
 
@@ -685,16 +685,16 @@ index 9819454ab..e67a7ce74 100644
  	remote-endpoint = <&usb_0_qmpphy_dp_in>;
  };
  
-@@ -734,10 +789,92 @@ &mdss0_dp1 {
+@@ -734,10 +789,93 @@ &mdss0_dp1 {
  };
- 
+
  &mdss0_dp1_out {
 -	data-lanes = <0 1>;
 +	data-lanes = <0 1 2 3>;
 +	link-frequencies = /bits/ 64 <1620000000 2700000000 5400000000 8100000000>;
  	remote-endpoint = <&usb_1_qmpphy_dp_in>;
  };
- 
+
 +&mdss0_dsi0 {
 +	vdda-supply = <&vreg_l3b>;
 +
@@ -707,6 +707,7 @@ index 9819454ab..e67a7ce74 100644
 +	panel: panel@0 {
 +		compatible = "csot,ppc357db1-4", "himax,hx83121a";
 +		reg = <0>;
++		rotation = <0>;
 +
 +		pinctrl-0 = <&disp_reset_n>, <&mdp_vsync_active>;
 +		pinctrl-names = "default";
@@ -1062,7 +1063,7 @@ new file mode 100644
 index 000000000..0108b380b
 --- /dev/null
 +++ b/arch/arm64/configs/gaokun3_defconfig
-@@ -0,0 +1,511 @@
+@@ -0,0 +1,512 @@
 +CONFIG_LOCALVERSION="-gaokun3"
 +# CONFIG_LOCALVERSION_AUTO is not set
 +CONFIG_SYSVIPC=y
@@ -1306,6 +1307,7 @@ index 000000000..0108b380b
 +CONFIG_MHI_WWAN_CTRL=m
 +CONFIG_MHI_WWAN_MBIM=m
 +CONFIG_INPUT_EVDEV=y
++CONFIG_INPUT_UINPUT=m
 +# CONFIG_KEYBOARD_ATKBD is not set
 +CONFIG_KEYBOARD_GPIO=y
 +# CONFIG_INPUT_MOUSE is not set
