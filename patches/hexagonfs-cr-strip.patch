@@ -1,0 +1,15 @@
+diff --git a/hexagonrpcd/hexagonfs.c b/hexagonrpcd/hexagonfs.c
+index bd9f353..3fc23c4 100644
+--- a/hexagonrpcd/hexagonfs.c
++++ b/hexagonrpcd/hexagonfs.c
+@@ -57,6 +57,10 @@ static char *copy_segment_and_advance(const char *path,
+ 	memcpy(segment, path, segment_len);
+ 	segment[segment_len] = 0;
+ 
++	/* Strip trailing \r from DSP firmware (Windows-built) paths */
++	if (segment_len > 0 && segment[segment_len - 1] == '\r')
++		segment[--segment_len] = 0;
++
+ 	*next = next_tmp;
+ 
+ 	return segment;
