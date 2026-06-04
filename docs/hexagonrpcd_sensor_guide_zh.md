@@ -2,6 +2,20 @@
 
 在 MateBook E Go 2023 (SC8280XP) 上启用 SLPI DSP 传感器（加速度计、陀螺仪、光照）。
 
+## 上游背景
+
+hexagonrpcd 是 [linux-msm/hexagonrpc](https://github.com/linux-msm/hexagonrpc) 项目，
+负责 Linux 与 Qualcomm SLPI DSP 之间的 fastRPC 通信。Gaokun3 的传感器运行在 SLPI 上，
+依赖 hexagonrpcd 的 hexagonfs 虚拟文件系统加载 DSP 固件和传感器注册表。
+
+**已知问题**：Gaokun3 的 SLPI 固件 (`qcslpi8280.mbn`) 由 Windows 工具链编译，嵌入的
+文件路径带 trailing `\r`（如 `hw_platform\r`），这是因为 Windows 上路径以 CRLF 存储。
+hexagonrpcd 的 `hexagonfs.c` 不 strip 这个字符，导致 DSP 发起的 `sensors/registry/`
+等文件查找全部失败，传感器无法初始化。
+
+**影响范围**：所有使用 Windows 分发的 Qualcomm SLPI 固件的设备。
+目前仅 Gaokun3 (MateBook E Go 2023) 测试过。
+
 ## 依赖
 
 1. **hexagonrpcd** — 须带 `\r` strip 补丁（本仓库 `patches/hexagonfs-cr-strip.patch`）
