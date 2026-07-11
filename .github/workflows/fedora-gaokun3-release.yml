@@ -14,11 +14,11 @@ on:
       desktop_environment:
         description: Desktop environment package group (single package or group)
         required: true
-        default: "@gnome-desktop"
+        default: "@gnome-desktop @workstation-product"
       excluded_packages:
         description: Packages to exclude from rootfs install (comma-separated)
         required: true
-        default: "gnome-boxes,gnome-connections,snapshot,gnome-weather,gnome-contacts,gnome-maps,simple-scan,gnome-clocks,gnome-calculator,gnome-calendar"
+        default: "gnome-boxes,gnome-connections,snapshot,gnome-weather,gnome-contacts,gnome-maps,simple-scan,gnome-clocks,gnome-calculator,gnome-calendar,amd-gpu-firmware,intel-gpu-firmware,linux-firmware,nvidia-gpu-firmware,toolbox,unoconv,mediawriter"
       extra_packages:
         description: Extra packages to install (space-separated)
         required: true
