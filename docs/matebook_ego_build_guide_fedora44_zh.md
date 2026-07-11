@@ -44,7 +44,7 @@ mkdir -p ~/gaokun/matebook-build-fedora
 cd ~/gaokun
 # 获取指定版本的 Linux 主线源码
 if [ ! -d "mainline-linux" ]; then
-    git clone --depth 1 --branch v7.1-rc3 \
+    git clone --depth 1 --branch v7.2-rc2 \
         https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git \
         mainline-linux
 fi
@@ -239,13 +239,6 @@ sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/touchscreen-tune.desktop \
     $ROOTFS_DIR/usr/share/applications/touchscreen-tune.desktop
 sudo chmod +x $ROOTFS_DIR/usr/local/bin/touchscreen-tune
 
-# 触控板激活脚本和服务
-sudo cp $GAOKUN_DIR/tools/touchpad/huawei-tp-activate.py \
-    $ROOTFS_DIR/usr/local/bin/
-sudo cp $GAOKUN_DIR/tools/touchpad/huawei-touchpad.service \
-    $ROOTFS_DIR/etc/systemd/system/
-sudo chmod +x $ROOTFS_DIR/usr/local/bin/huawei-tp-activate.py
-
 # GDM 显示器同步脚本和服务
 sudo cp $GAOKUN_DIR/tools/monitors/gdm-monitor-sync \
     $ROOTFS_DIR/usr/local/bin/
@@ -260,18 +253,6 @@ sudo cp $GAOKUN_DIR/tools/bluetooth/patch-nvm-bdaddr.service \
     $ROOTFS_DIR/etc/systemd/system/
 sudo chmod +x $ROOTFS_DIR/usr/local/bin/patch-nvm-bdaddr.py
 
-# Wi-Fi MAC 稳定脚本、udev 规则和服务
-sudo cp $GAOKUN_DIR/tools/wifi/set-stable-wifi-mac.py \
-    $ROOTFS_DIR/usr/local/bin/
-sudo cp $GAOKUN_DIR/tools/wifi/gaokun-wifi-mac@.service \
-    $ROOTFS_DIR/etc/systemd/system/
-sudo cp $GAOKUN_DIR/tools/wifi/80-gaokun-wifi-mac.rules \
-    $ROOTFS_DIR/etc/udev/rules.d/
-sudo chmod +x $ROOTFS_DIR/usr/local/bin/set-stable-wifi-mac.py
-sudo mkdir -p $ROOTFS_DIR/etc/systemd/system/sys-subsystem-net-devices-wlP6p1s0.device.wants
-sudo ln -sf /etc/systemd/system/gaokun-wifi-mac@.service \
-    $ROOTFS_DIR/etc/systemd/system/sys-subsystem-net-devices-wlP6p1s0.device.wants/gaokun-wifi-mac@wlP6p1s0.service
-
 # 音频 UCM 配置
 sudo cp $GAOKUN_DIR/tools/audio/sc8280xp.conf \
     $ROOTFS_DIR/usr/share/alsa/ucm2/Qualcomm/sc8280xp/
@@ -285,9 +266,6 @@ sudo cp $GAOKUN_DIR/tools/image-assets/usr/local/share/gaokun/monitors.xml \
 
 # bluetooth.conf 现在会同时加载 btqca 和 uhid，避免 BLE HoG 鼠标/键盘配对后立刻断开。
 # patch-nvm-bdaddr.service 会在 bluetooth.service 之前修补 qca/wcnhpnv21g.bin 中的 BDADDR。
-# gaokun-wifi-mac@.service 会在 Wi-Fi 设备出现时运行，
-# 默认按机器标识生成稳定 MAC；如果你想固定成某一张地址，
-# 可以在镜像里放置 /etc/gaokun/wifi-mac-address。
 ```
 
 ---
@@ -393,7 +371,7 @@ cat > /etc/kernel/devicetree <<EOF
 qcom/sc8280xp-huawei-gaokun3.dtb
 EOF
 
-systemctl enable huawei-touchpad.service gdm-monitor-sync.service \
+systemctl enable gdm-monitor-sync.service \
     patch-nvm-bdaddr.service
 
 dracut --force --kver $KREL

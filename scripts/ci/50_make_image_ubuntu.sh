@@ -112,9 +112,9 @@ ExecStart=/bin/sh -c 'mkdir -p /tmp/.X11-unix && chown root:root /tmp/.X11-unix 
 WantedBy=graphical.target
 EOF
 
-systemctl enable gdm NetworkManager ssh huawei-touchpad.service \
+systemctl enable gdm NetworkManager ssh \
   gaokun-fix-x11-unix.service gdm-monitor-sync.service \
-  patch-nvm-bdaddr.service gaokun-wifi-mac@wlP6p1s0.service || true
+  patch-nvm-bdaddr.service || true
 
 cat >> /etc/initramfs-tools/modules <<'MODEOF'
 # Storage and USB

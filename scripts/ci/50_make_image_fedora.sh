@@ -105,9 +105,8 @@ install -d -m 0755 /home/user/.config
 install -Dm644 /usr/local/share/gaokun/monitors.xml /home/user/.config/monitors.xml
 chown -R user:user /home/user
 
-systemctl enable gdm NetworkManager sshd huawei-touchpad.service \
-  gdm-monitor-sync.service patch-nvm-bdaddr.service \
-  gaokun-wifi-mac@wlP6p1s0.service || true
+systemctl enable gdm NetworkManager sshd \
+  gdm-monitor-sync.service patch-nvm-bdaddr.service || true
 
 cat > /etc/dracut.conf.d/matebook.conf <<'MODEOF'
 hostonly="no"

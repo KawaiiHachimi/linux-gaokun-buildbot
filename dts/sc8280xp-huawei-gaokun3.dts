@@ -421,9 +421,10 @@
 			regulator-max-microvolt = <1200000>;
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 			regulator-boot-on;
-			regulator-allow-set-load;
-			regulator-allowed-modes = <RPMH_REGULATOR_MODE_LPM
-						   RPMH_REGULATOR_MODE_HPM>;
+			// HACK: wrongly voting for LPM may block DP Alt
+			// regulator-allow-set-load;
+			// regulator-allowed-modes = <RPMH_REGULATOR_MODE_LPM
+			// 			   RPMH_REGULATOR_MODE_HPM>;
 		};
 
 		vreg_l4b: ldo4 {
@@ -431,9 +432,10 @@
 			regulator-min-microvolt = <912000>;
 			regulator-max-microvolt = <912000>;
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
-			regulator-allow-set-load;
-			regulator-allowed-modes = <RPMH_REGULATOR_MODE_LPM
-						   RPMH_REGULATOR_MODE_HPM>;
+			// HACK: wrongly voting for LPM may block DP Alt
+			// regulator-allow-set-load;
+			// regulator-allowed-modes = <RPMH_REGULATOR_MODE_LPM
+			// 			   RPMH_REGULATOR_MODE_HPM>;
 		};
 
 		vreg_l6b: ldo6 {
@@ -542,9 +544,10 @@
 			regulator-min-microvolt = <1200000>;
 			regulator-max-microvolt = <1200000>;
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
-			regulator-allow-set-load;
-			regulator-allowed-modes = <RPMH_REGULATOR_MODE_LPM
-						   RPMH_REGULATOR_MODE_HPM>;
+			// HACK: wrongly voting for LPM may block DP Alt
+			// regulator-allow-set-load;
+			// regulator-allowed-modes = <RPMH_REGULATOR_MODE_LPM
+			// 			   RPMH_REGULATOR_MODE_HPM>;
 		};
 
 		vreg_l6d: ldo6 {
@@ -582,9 +585,10 @@
 			regulator-min-microvolt = <912000>;
 			regulator-max-microvolt = <912000>;
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
-			regulator-allow-set-load;
-			regulator-allowed-modes = <RPMH_REGULATOR_MODE_LPM
-						   RPMH_REGULATOR_MODE_HPM>;
+			// HACK: wrongly voting for LPM may block DP Alt
+			// regulator-allow-set-load;
+			// regulator-allowed-modes = <RPMH_REGULATOR_MODE_LPM
+			// 			   RPMH_REGULATOR_MODE_HPM>;
 		};
 /*
 		vreg_l10d: ldo10 {
@@ -628,6 +632,7 @@
 	};
 };
 
+
 &i2c4 {
 	clock-frequency = <1000000>;
 
@@ -640,6 +645,8 @@
 };
 
 &spi6 {
+	qcom,force-gsi-mode;
+
 	pinctrl-0 = <&spi6_default>;
 	pinctrl-names = "default";
 
@@ -1267,7 +1274,7 @@
 		vddbtcmx-supply = <&vreg_pmu_btcmx_0p8>;
 		vddrfa0p8-supply = <&vreg_pmu_rfa_0p8>;
 		vddrfa1p2-supply = <&vreg_pmu_rfa_1p2>;
-		vddrfa1p8-supply = <&vreg_pmu_rfa_1p7>;
+		vddrfa1p7-supply = <&vreg_pmu_rfa_1p7>;
 
 		max-speed = <3200000>;
 
@@ -1337,6 +1344,7 @@
 	vdda-phy-supply = <&vreg_l3b>;
 	vdda-pll-supply = <&vreg_l4b>;
 
+	mode-switch;
 	orientation-switch;
 
 	status = "okay";
@@ -1408,11 +1416,6 @@
 
 	qcom,dmic-sample-rate = <4800000>;
 
-	status = "okay";
-};
-
-&venus {
-	firmware-name = "qcom/sc8280xp/HUAWEI/gaokun3/qcvss8280.mbn";
 	status = "okay";
 };
 
@@ -1727,3 +1730,5 @@
 		bias-pull-down;
 	};
 };
+
+#include "sc8280xp-huawei-gaokun3-camera.dtsi"
