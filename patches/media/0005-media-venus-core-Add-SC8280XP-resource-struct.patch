@@ -15,13 +15,14 @@ Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
  1 file changed, 44 insertions(+)
 
 diff --git a/drivers/media/platform/qcom/venus/core.c b/drivers/media/platform/qcom/venus/core.c
-index 747f13442..71872ea82 100644
+index 824a30a..e16e628 100644
 --- a/drivers/media/platform/qcom/venus/core.c
 +++ b/drivers/media/platform/qcom/venus/core.c
-@@ -1127,6 +1127,49 @@ static const struct venus_resources sc7280_res = {
+@@ -1156,6 +1156,49 @@ static const struct venus_resources sc7280_res = {
+ 	.dec_nodename = "video-decoder",
  	.enc_nodename = "video-encoder",
  };
- 
++
 +static const struct freq_tbl sc8280xp_freq_table[] = {
 +	{ 0, 239999999 },
 +	{ 0, 338000000 },
@@ -64,18 +65,16 @@ index 747f13442..71872ea82 100644
 +	.cp_nonpixel_size = 0x24800000,
 +	.fwname = "qcom/vpu-2.0/venus.mbn",
 +};
-+
+ #endif
+ 
  static const struct bw_tbl qcm2290_bw_table_dec[] = {
- 	{ 352800, 597000, 0, 746000, 0 }, /* 1080p@30 + 720p@30 */
- 	{ 244800, 413000, 0, 516000, 0 }, /* 1080p@30 */
-@@ -1183,6 +1226,7 @@ static const struct of_device_id venus_dt_match[] = {
- 	{ .compatible = "qcom,qcm2290-venus", .data = &qcm2290_res },
- 	{ .compatible = "qcom,sc7180-venus", .data = &sc7180_res },
+@@ -1222,6 +1265,7 @@ static const struct of_device_id venus_dt_match[] = {
  	{ .compatible = "qcom,sc7280-venus", .data = &sc7280_res },
+ 	{ .compatible = "qcom,sm8250-venus", .data = &sm8250_res },
+ 	{ .compatible = "qcom,sm8350-venus", .data = &sm8350_res },
 +	{ .compatible = "qcom,sc8280xp-venus", .data = &sc8280xp_res },
- 	{ .compatible = "qcom,sdm660-venus", .data = &sdm660_res },
- 	{ .compatible = "qcom,sdm845-venus", .data = &sdm845_res },
- 	{ .compatible = "qcom,sdm845-venus-v2", .data = &sdm845_res_v2 },
+ #endif
+ 	{}
+ };
 -- 
 2.52.0
-

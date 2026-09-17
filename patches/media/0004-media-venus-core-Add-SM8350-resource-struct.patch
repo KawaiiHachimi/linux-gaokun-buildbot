@@ -14,10 +14,10 @@ Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
  1 file changed, 39 insertions(+)
 
 diff --git a/drivers/media/platform/qcom/venus/core.c b/drivers/media/platform/qcom/venus/core.c
-index 1f42792f0..747f13442 100644
+index a2ee7dc..824a30a 100644
 --- a/drivers/media/platform/qcom/venus/core.c
 +++ b/drivers/media/platform/qcom/venus/core.c
-@@ -1025,6 +1025,44 @@ static const struct venus_resources sm8250_res = {
+@@ -1054,6 +1054,44 @@ static const struct venus_resources sm8250_res = {
  	.enc_nodename = "video-encoder",
  };
  
@@ -62,14 +62,13 @@ index 1f42792f0..747f13442 100644
  static const struct freq_tbl sc7280_freq_table[] = {
  	{ 0, 460000000 },
  	{ 0, 424000000 },
-@@ -1149,6 +1187,7 @@ static const struct of_device_id venus_dt_match[] = {
- 	{ .compatible = "qcom,sdm845-venus", .data = &sdm845_res },
- 	{ .compatible = "qcom,sdm845-venus-v2", .data = &sdm845_res_v2 },
+@@ -1183,6 +1221,7 @@ static const struct of_device_id venus_dt_match[] = {
+ #if (!IS_ENABLED(CONFIG_VIDEO_QCOM_IRIS))
+ 	{ .compatible = "qcom,sc7280-venus", .data = &sc7280_res },
  	{ .compatible = "qcom,sm8250-venus", .data = &sm8250_res },
 +	{ .compatible = "qcom,sm8350-venus", .data = &sm8350_res },
+ #endif
  	{}
  };
- MODULE_DEVICE_TABLE(of, venus_dt_match);
 -- 
 2.52.0
-
