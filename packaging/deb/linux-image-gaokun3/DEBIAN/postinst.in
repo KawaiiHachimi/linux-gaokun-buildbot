@@ -11,6 +11,8 @@ cleanup() {
 }
 trap cleanup EXIT
 mkdir -p /etc/kernel
+# Read by the systemd-boot hook invoked through update-initramfs.
+printf 'ubuntu\n' > /etc/kernel/entry-token
 for name in install.conf cmdline devicetree; do
   if [ -f "/etc/kernel/$name" ]; then
     cp "/etc/kernel/$name" "$temp_kernel_dir/$name.orig"

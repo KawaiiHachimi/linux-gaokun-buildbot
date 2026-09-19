@@ -2,18 +2,16 @@
 
 # linux-gaokun-buildbot
 
-面向华为 MateBook E Go 2023（代号 `gaokun3`）、基于高通骁龙 8cx Gen3（`SC8280XP`）平台的 Linux 镜像构建脚本、补丁、内核配置、设备树文件、工具和固件。
+面向华为 MateBook E Go 2023（代号 `gaokun3`）、基于高通骁龙 8cx Gen3（`SC8280XP`）平台的 Linux 镜像构建脚本、工具和固件。内核源码、驱动、设备树及配置在独立的下游内核仓库维护。
 
-镜像流水线现默认使用 `systemd-boot`，并可选构建带 `CONFIG_LOCALVERSION="-gaokun3-el2"` 的第二套 EL2 内核变体。
+**迁移草案，尚不可发布。** 目标为 `gaokun3/linux` 与 `gaokun3/buildbot`；内核候选提交尚待推送到目标仓库，EL2 已禁用。参见 [迁移记录与检查项](migration.md)。
+
+`build.env` 固定内核 SHA 与发行版版本；`./build.sh kernel|debs|rpms` 是本地入口，镜像组装暂仍由 CI 执行。
 
 ## 包含内容
 
 ### 仓库结构
 
-- `patches/`：内核补丁和设备支持更改
-- `defconfig/`：CI/手动构建使用的本地内核配置
-- `drivers/`：补丁系列中修改过的驱动源码本地镜像
-- `dts/`：补丁系列中修改过的设备树源码本地镜像
 - `docs/`：中英文使用/构建指南与平台说明
 - `firmware/`：镜像构建使用的最小固件集
 - `packaging/`：各发行版内核和固件包的打包模板和元数据
@@ -27,7 +25,7 @@
 
 - **Fedora (RPM)**：`kernel-gaokun3`、`kernel-modules-gaokun3`、`kernel-devel-gaokun3`、`linux-firmware-gaokun3`
 - **Ubuntu (DEB)**：`linux-image-gaokun3`、`linux-modules-gaokun3`、`linux-headers-gaokun3`、`linux-firmware-gaokun3`
-- **可选 EL2 变体**：用于第二套 EL2 内核构建的 `*-gaokun3-el2` 软件包集
+- **EL2 暂停构建**：等待独立迁移与验证；请求 EL2 构建会提前报错。
 - Ubuntu 内核镜像包在安装/升级时运行 `update-initramfs`，进而通过发行版的 `systemd-boot` 钩子刷新 BLS 条目。
 - Fedora 内核 RPM 现自带匹配的 `dracut.conf.d` 片段，并在 `%posttrans` 中运行 `dracut` + `kernel-install add`，因此安装或升级软件包会自动刷新 initramfs 和 BLS 条目。
 
@@ -36,16 +34,9 @@
 - Fedora 和 Ubuntu 镜像 release 包含压缩后的可安装镜像。
 - Gaokun RPM 和 DEB release 包含镜像工作流所使用的独立内核与固件软件包集合。
 
-### 补丁来源
+### 内核来源
 
-- `upstream/*`, `others/0017`：来自 [right-0903/linux-gaokun](https://github.com/right-0903/linux-gaokun)，涵盖基础 SC8280XP / gaokun3 使能、显示点亮、EC 挂起恢复、ADSP FastRPC 以及 DSI 稳定性相关改动
-- `others/0001`：来自 [whitelewi1-ctrl/matebook-e-go-linux](https://github.com/whitelewi1-ctrl/matebook-e-go-linux)，用于在蓝牙地址无效时避免设置 `USE_BDADDR_PROPERTY`
-- `others/0002`：本仓库内的本地改动，用于启用 DSC 以及 60 Hz / 120 Hz 切换
-- `others/0003`：来自 [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux)，用于加入 Himax HX83121A SPI 触摸屏驱动
-- `others/0004`：来自 [TheUnknownThing/linux-gaokun](https://github.com/TheUnknownThing/linux-gaokun)，用于改进 Type-C 路径的 UCSI 处理和模块接线
-- `media/*`：来自 [jhovold/linux](https://github.com/jhovold/linux/commits/wip/sc8280xp-6.16), 为高通 SC8280XP 平台 添加 Venus 视频编解码驱动支持
-- `0099`：本仓库内的本地补丁，用于导入当前的 DTS 文件和 `gaokun3_defconfig`
-- **[可选]** `el2/*`：来自 [TravMurav/linux](https://github.com/TravMurav/linux/tree/x13s-6.18-v1.1-cxsd)，用于补齐 EL2 启动路径中的 SMP2P 接管、remoteproc attach/restart 流程、SCM/SHM owner 处理，以及 rpmsg / QRTR / pmic_glink 相关稳定性修复
+驱动改动与原作者信息保存在下游内核 Git 提交中。旧补丁文件仍可从本仓库迁移前的 Git 历史取回，详见 [迁移记录](migration.md)。
 
 ### Tools 来源
 
@@ -58,8 +49,9 @@
 
 镜像和本地安装工作流现遵循标准 `kernel-install` + BLS 流程，而非手动编写 `systemd-boot` 条目。
 
-- BLS 条目名称和条目目录由 `kernel-install` 生成。使用默认 `--entry-token=machine-id` 时，文件名与 `/etc/machine-id` 绑定，如 `loader/entries/<machine-id>-<kernel-release>.conf`。
-- 复制到 ESP 的内核、initrd/initramfs 和 DTB 文件也会由发行版钩子自动放入匹配的 `<entry-token>/<kernel-release>/` 目录。
+- BLS 条目使用发行版名称：`loader/entries/fedora-<kernel-release>.conf` 或 `loader/entries/ubuntu-<kernel-release>.conf`。`/etc/kernel/entry-token` 持久保存名称，供升级及 initramfs 钩子读取；显式调用使用 `--entry-token=os-id`。
+- ESP 上的内核、initrd/initramfs 和 DTB 放在 `fedora/<kernel-release>/` 或 `ubuntu/<kernel-release>/`，与系统自身的 machine-id 分开。
+- 迁移时保留旧的 machine-id 启动项供回退，确认新项可启动后再清理。同一 ESP 上安装两份同发行版系统时，需要不同标识。详见 [启动布局](boot-layout.md)。
 - 在 `/boot` 中还会保留一份 DTB 的兼容副本，方便用户后续切换到 GRUB。
 - Ubuntu DTB 安装在 `/usr/lib/linux-image-<kernel-release>/qcom/` 供 `kernel-install` 使用，另有 `/boot/dtb-<kernel-release>` 兼容副本。
 - Fedora DTB 安装在 `/usr/lib/modules/<kernel-release>/dtb/qcom/` 供 `kernel-install` 使用，另有 `/boot/dtb-<kernel-release>/qcom/` 兼容副本。
@@ -67,7 +59,7 @@
 
 ## 快速开始
 
-- Release：<https://github.com/KawaiiHachimi/linux-gaokun-build/releases>
+- Release：<https://github.com/KawaiiHachimi/linux-gaokun-buildbot/releases>
 - 双系统引导指南：[English](dual_boot_guide_en.md) | [中文](dual_boot_guide_zh.md)
 - EL2 实现说明：[English](el2_kvm_guide_en.md) | [中文](el2_kvm_guide_zh.md)
 - Awesome Gaokun3：：[English](awesome_gaokun3_en.md) | [中文](awesome_gaokun3_zh.md)

@@ -1,3 +1,5 @@
+> 历史指南：以下补丁目录和内核构建步骤适用于迁移前版本。当前入口及未完成项见 [迁移记录](migration.md)。EL2 暂不可构建。
+
 [English](el2_kvm_guide_en.md) | 中文
 
 # Huawei MateBook E Go 2023 EL2 实现说明

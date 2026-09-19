@@ -118,6 +118,9 @@ cat > /etc/kernel/install.conf <<'EOF'
 layout=bls
 EOF
 
+# Persist the same short token for later package and initramfs hooks.
+printf '%s\n' 'fedora' > /etc/kernel/entry-token
+
 install -d /etc/kernel/install.d
 ln -sf /dev/null /etc/kernel/install.d/51-dracut-rescue.install
 
@@ -136,7 +139,6 @@ fi
 
 rm -f /etc/machine-id
 systemd-machine-id-setup
-MACHINE_ID="$(cat /etc/machine-id)"
 
 bootctl --no-variables --esp-path=/boot/efi install
 
@@ -154,9 +156,9 @@ EOF
   printf '%s\n' "$cmdline" > "$conf_root/cmdline"
   printf 'qcom/%s\n' "$dtb" > "$conf_root/devicetree"
 
-  kernel-install --entry-token=machine-id remove "$krel" || true
+  kernel-install --entry-token=os-id remove "$krel" || true
   KERNEL_INSTALL_CONF_ROOT="$conf_root" \
-    kernel-install --verbose --make-entry-directory=yes --entry-token=machine-id add \
+    kernel-install --verbose --make-entry-directory=yes --entry-token=os-id add \
     "$krel" "$image"
   rm -rf "$conf_root"
 }
@@ -178,7 +180,7 @@ if [[ "$BUILD_EL2" == "true" && -n "$KREL_EL2" ]]; then
 fi
 
 cat > /boot/efi/loader/loader.conf <<EOF
-default ${MACHINE_ID}-${KREL}.conf
+default fedora-${KREL}.conf
 timeout 5
 console-mode keep
 editor no

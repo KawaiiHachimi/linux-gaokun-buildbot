@@ -1,3 +1,5 @@
+> Historical guide: patch paths and kernel build steps below describe the pre-migration tree. See the [migration record](migration.md) for current entry points and blockers. EL2 builds are paused.
+
 English | [中文](matebook_ego_build_guide_fedora44_zh.md)
 
 # Huawei MateBook E Go 2023 Fedora 44 Manual Build Guide

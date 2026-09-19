@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-KERNEL_TAG="${KERNEL_TAG:-v7.2-rc2}"
-GAOKUN_DIR="${GAOKUN_DIR:-$HOME/gaokun/linux-gaokun-buildbot}"
-KERN_SRC="${KERN_SRC:-$HOME/gaokun/mainline-linux}"
+GAOKUN_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
+# shellcheck source=../../build.env
+. "$GAOKUN_DIR/build.env"
+# shellcheck source=../lib/kernel_source.sh
+. "$GAOKUN_DIR/scripts/lib/kernel_source.sh"
+KERN_SRC="${KERN_SRC:-$HOME/gaokun/linux}"
+KERN_SRC_STANDARD="$KERN_SRC"
+KERN_SRC_EL2="${KERN_SRC_EL2:-$HOME/gaokun/linux-el2}"
 KERN_OUT="${KERN_OUT:-$HOME/gaokun/kernel-out}"
 KERN_OUT_EL2="${KERN_OUT_EL2:-$HOME/gaokun/kernel-out-el2}"
 
@@ -53,66 +58,6 @@ fi
 read -r -p "Build EL2 kernel? (Y: only EL2, n: only standard, both: build both) [default: n]: " el2_choice
 el2_choice="${el2_choice:-n}"
 
-configure_git_identity() {
-    if [[ -z "$(git -C "$KERN_SRC" config user.name || true)" ]]; then
-        git -C "$KERN_SRC" config user.name "local builder"
-    fi
-    if [[ -z "$(git -C "$KERN_SRC" config user.email || true)" ]]; then
-        git -C "$KERN_SRC" config user.email "builder@example.com"
-    fi
-}
-
-ensure_source_tree() {
-    if [[ -f "$KERN_SRC/arch/arm64/configs/gaokun3_defconfig" ]]; then
-        return 0
-    fi
-
-    read -r -p "gaokun3_defconfig not found in kernel directory. Pull kernel and apply patches? [y/N] [default: N]: " response
-    response="${response:-N}"
-    if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-        echo "Exiting."
-        exit 1
-    fi
-
-    if [[ ! -d "$GAOKUN_DIR" ]]; then
-        echo "linux-gaokun-buildbot not found. Cloning..."
-        mkdir -p "$HOME/gaokun"
-        git clone https://github.com/KawaiiHachimi/linux-gaokun-buildbot "$GAOKUN_DIR"
-    fi
-
-    read -r -p "Use Chinese mirror (mirrors.bfsu.edu.cn) for Linux kernel? [Y/n] [default: Y]: " mirror_choice
-    mirror_choice="${mirror_choice:-Y}"
-    if [[ "$mirror_choice" =~ ^([nN][oO]|[nN])$ ]]; then
-        KERNEL_URL="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
-    else
-        KERNEL_URL="https://mirrors.bfsu.edu.cn/git/linux.git"
-    fi
-
-    rm -rf "$KERN_SRC"
-    git clone --depth=1 "$KERNEL_URL" "$KERN_SRC" -b "$KERNEL_TAG"
-    configure_git_identity
-
-    echo "Applying standard gaokun3 patches..."
-    git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/upstream/*.patch
-    git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/others/*.patch
-    git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/media/*.patch
-    git -C "$KERN_SRC" am "$GAOKUN_DIR"/patches/0099-arm64-gaokun3-import-local-dts-and-defconfig.patch
-}
-
-el2_state() {
-    if git -C "$KERN_SRC" log -1 --pretty=%B 2>/dev/null | grep -q "^Apply EL2 patches$"; then
-        printf 'el2\n'
-        return 0
-    fi
-
-    if git -C "$KERN_SRC" apply --reverse --check "$GAOKUN_DIR"/patches/el2/*.patch >/dev/null 2>&1; then
-        printf 'el2-mixed\n'
-        return 0
-    fi
-
-    printf 'standard\n'
-}
-
 ensure_ubuntu_initramfs_firmware_hook() {
     sudo mkdir -p /etc/initramfs-tools/hooks
     sudo tee /etc/initramfs-tools/hooks/gaokun3-firmware >/dev/null <<'EOF'
@@ -141,57 +86,26 @@ build_kernel() {
     local conf_root
     local temp_kernel_conf_root=""
     local restore_kernel_conf=0
-    local current_state
-
-    cd "$KERN_SRC"
-    current_state="$(el2_state)"
-
-    if [[ "$mode" == "el2" ]]; then
+    if [[ "$mode" == el2 ]]; then
+        if [[ -z "$KERNEL_EL2_COMMIT" ]]; then
+            echo 'EL2 migration is not ready: KERNEL_EL2_COMMIT is unset.' >&2
+            return 1
+        fi
+        KERN_SRC="$KERN_SRC_EL2"
         out_dir="$KERN_OUT_EL2"
         dtb_name="sc8280xp-huawei-gaokun3-el2.dtb"
-
-        echo -e "\n=== Preparing Source Tree for EL2 Kernel ==="
-        case "$current_state" in
-            standard)
-                echo "Applying EL2 patches to source tree..."
-                git apply --index "$GAOKUN_DIR"/patches/el2/*.patch
-                git commit -m "Apply EL2 patches"
-                ;;
-            el2)
-                echo "Source tree is already patched for EL2."
-                ;;
-            *)
-                echo "Source tree already contains EL2 changes, but the last commit is not the expected temporary EL2 commit." >&2
-                echo "Please restore the tree to a clean standard-patched state before using this helper." >&2
-                exit 1
-                ;;
-        esac
-
-        mkdir -p "$out_dir"
-        make O="$out_dir" ARCH=arm64 CROSS_COMPILE="$CROSS_COMPILE" gaokun3_defconfig
-        "$KERN_SRC"/scripts/config --file "$out_dir/.config" --set-str LOCALVERSION "-gaokun3-el2"
+        prepare_kernel_source "$KERN_SRC" "$KERNEL_EL2_COMMIT"
     else
+        KERN_SRC="$KERN_SRC_STANDARD"
         out_dir="$KERN_OUT"
         dtb_name="sc8280xp-huawei-gaokun3.dtb"
-
-        echo -e "\n=== Preparing Source Tree for Standard Kernel ==="
-        case "$current_state" in
-            el2)
-                echo "Reverting EL2 patches to restore standard source tree..."
-                git reset --hard HEAD~1
-                ;;
-            standard)
-                echo "Source tree is already in standard state."
-                ;;
-            *)
-                echo "Source tree looks EL2-patched, but the last commit is not the expected temporary EL2 commit." >&2
-                echo "Refusing to run git reset --hard HEAD~1 on an unexpected history shape." >&2
-                exit 1
-                ;;
-        esac
-
-        mkdir -p "$out_dir"
-        make O="$out_dir" ARCH=arm64 CROSS_COMPILE="$CROSS_COMPILE" gaokun3_defconfig
+        prepare_kernel_source "$KERN_SRC" "$KERNEL_COMMIT"
+    fi
+    cd "$KERN_SRC"
+    mkdir -p "$out_dir"
+    make O="$out_dir" ARCH=arm64 CROSS_COMPILE="$CROSS_COMPILE" gaokun3_defconfig
+    if [[ "$mode" == el2 ]]; then
+        scripts/config --file "$out_dir/.config" --set-str LOCALVERSION "-gaokun3-el2"
     fi
 
     echo "Starting build..."
@@ -258,6 +172,10 @@ build_kernel() {
         cmdline="${cmdline#" "}"
     fi
 
+    # Keep automatic initramfs hooks and explicit kernel-install calls aligned.
+    sudo install -d /etc/kernel
+    printf '%s\n' "$DISTRO" | sudo tee /etc/kernel/entry-token >/dev/null
+
     conf_root="$(mktemp -d)"
     trap 'rm -rf "$conf_root"' RETURN
 
@@ -295,14 +213,14 @@ build_kernel() {
     echo "  dtb source:     $dtb_inst_dir/$dtb_name"
 
     {
-        sudo kernel-install --entry-token=machine-id remove "$krel" >/dev/null 2>&1 || true
+        sudo kernel-install --entry-token=os-id remove "$krel" >/dev/null 2>&1 || true
         if [[ "$DISTRO" == "fedora" ]]; then
             sudo env KERNEL_INSTALL_CONF_ROOT="$conf_root" \
-                kernel-install --verbose --make-entry-directory=yes --entry-token=machine-id add \
+                kernel-install --verbose --make-entry-directory=yes --entry-token=os-id add \
                 "$krel" "/boot/vmlinuz-$krel"
         else
             sudo env KERNEL_INSTALL_CONF_ROOT="$conf_root" \
-                kernel-install --verbose --make-entry-directory=yes --entry-token=machine-id add \
+                kernel-install --verbose --make-entry-directory=yes --entry-token=os-id add \
                 "$krel" "/boot/vmlinuz-$krel" "/boot/$initrd_src"
         fi
     } || {
@@ -336,8 +254,6 @@ build_kernel() {
     trap - RETURN
 }
 
-ensure_source_tree
-configure_git_identity
 
 if command -v ccache >/dev/null 2>&1; then
     echo "Resetting ccache statistics..."

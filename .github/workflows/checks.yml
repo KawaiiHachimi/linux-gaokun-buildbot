@@ -1,0 +1,22 @@
+name: Check build scripts
+on:
+  pull_request:
+  push:
+    branches: [main, next]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install check dependencies
+        run: sudo apt-get update && sudo apt-get install -y shellcheck systemd-boot
+      - name: Check shell syntax
+        run: |
+          bash -n build.sh build.env
+          find scripts -name '*.sh' -print0 | xargs -0 -n1 bash -n
+      - name: Check new build entry points
+        run: shellcheck -S warning build.sh scripts/lib/kernel_source.sh scripts/ci/20_build_kernel_variants.sh scripts/local/build_kernel.sh
+      - name: Check source protection and boot entries
+        run: python3 -m unittest discover -s tests -v

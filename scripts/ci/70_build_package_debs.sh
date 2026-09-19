@@ -5,9 +5,11 @@ set -euo pipefail
 : "${WORKDIR:?missing WORKDIR}"
 : "${ARTIFACT_DIR:?missing ARTIFACT_DIR}"
 : "${KERNEL_TAG:?missing KERNEL_TAG}"
+: "${KERNEL_COMMIT:?missing KERNEL_COMMIT}"
 : "${PACKAGE_RELEASE_TAG:?missing PACKAGE_RELEASE_TAG}"
 
 BUILD_EL2="${BUILD_EL2:-false}"
+BUILDBOT_COMMIT="${BUILDBOT_COMMIT:-$(git -C "$GAOKUN_DIR" rev-parse HEAD)}"
 KERN_SRC_BASE="${KERN_SRC_BASE:-${KERN_SRC:-}}"
 KERN_OUT="${KERN_OUT:-}"
 KERN_SRC_EL2="${KERN_SRC_EL2:-${KERN_SRC:-}}"
@@ -280,6 +282,8 @@ cat >"$ARTIFACT_DIR/package-manifest.json" <<EOF
 {
   "package_release_tag": "${PACKAGE_RELEASE_TAG}",
   "kernel_tag": "${KERNEL_TAG}",
+  "kernel_commit": "${KERNEL_COMMIT:?missing KERNEL_COMMIT}",
+  "buildbot_commit": "${BUILDBOT_COMMIT}",
   "build_el2": ${BUILD_EL2},
   "built_at_utc": "${BUILD_TIME_UTC}",
   "firmware_version": "${FIRMWARE_DEB_VERSION}",

@@ -3,16 +3,8 @@ name: Build Image - Fedora Gaokun3
 on:
   workflow_dispatch:
     inputs:
-      fedora_release:
-        description: Fedora release version
-        required: true
-        default: "44"
-      kernel_tag:
-        description: Linux kernel tag
-        required: true
-        default: "v7.2-rc2"
       desktop_environment:
-        description: Desktop environment package group (single package or group)
+        description: Desktop environment packages or groups (space-separated)
         required: true
         default: "@gnome-desktop @workstation-product"
       excluded_packages:
@@ -42,7 +34,6 @@ jobs:
     if: ${{ github.event.inputs.rebuild_package_rpms == 'true' }}
     uses: ./.github/workflows/gaokun3-package-rpms.yml
     with:
-      kernel_tag: ${{ github.event.inputs.kernel_tag }}
       build_el2: ${{ github.event.inputs.build_el2 == 'true' }}
     secrets: inherit
 
@@ -52,8 +43,6 @@ jobs:
     runs-on: ubuntu-24.04-arm
     env:
       TZ: UTC
-      FEDORA_RELEASE: ${{ github.event.inputs.fedora_release }}
-      KERNEL_TAG: ${{ github.event.inputs.kernel_tag }}
       DESKTOP_ENVIRONMENT: ${{ github.event.inputs.desktop_environment }}
       EXCLUDED_PACKAGES: ${{ github.event.inputs.excluded_packages }}
       EXTRA_PACKAGES: ${{ github.event.inputs.extra_packages }}
@@ -65,11 +54,23 @@ jobs:
       ROOTFS_DIR: ${{ github.workspace }}/build-fedora/rootfs
       ARTIFACT_DIR: ${{ github.workspace }}/build-fedora/artifacts
       PACKAGE_RPMS_DIR: ${{ github.workspace }}/build-fedora/package-rpms
-      IMAGE_FILE: ${{ github.workspace }}/build-fedora/fedora-${{ github.event.inputs.fedora_release }}-gaokun3.img
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Load reviewed build inputs
+        run: |
+          set -euo pipefail
+          . ./build.env
+          if [[ "$BUILD_EL2" == true && -z "$KERNEL_EL2_COMMIT" ]]; then
+            echo 'EL2 migration is not ready: KERNEL_EL2_COMMIT is unset.' >&2
+            exit 1
+          fi
+          for name in KERNEL_REPOSITORY KERNEL_TAG KERNEL_COMMIT KERNEL_EL2_COMMIT FEDORA_RELEASE UBUNTU_RELEASE; do
+            printf '%s=%s\n' "$name" "${!name}" >> "$GITHUB_ENV"
+          done
+          echo "IMAGE_FILE=$WORKDIR/fedora-${FEDORA_RELEASE}-gaokun3.img" >> "$GITHUB_ENV"
 
       - name: Install host dependencies
         run: |
@@ -150,6 +151,11 @@ jobs:
           manifest_path="$PACKAGE_RPMS_DIR/package-manifest.json"
           manifest_kernel_tag="$(jq -r '.kernel_tag' "$manifest_path")"
           manifest_build_el2="$(jq -r '.build_el2' "$manifest_path")"
+          manifest_kernel_commit="$(jq -r '.kernel_commit' "$manifest_path")"
+          if [[ "$manifest_kernel_commit" != "$KERNEL_COMMIT" ]]; then
+            echo "Package source commit does not match build.env; rebuild the packages." >&2
+            exit 1
+          fi
 
           if [[ "$manifest_kernel_tag" != "$KERNEL_TAG" ]]; then
             echo "package release kernel tag mismatch: expected ${KERNEL_TAG}, got ${manifest_kernel_tag}" >&2
@@ -195,9 +201,12 @@ jobs:
           sudo docker run --rm \
             -v "$GITHUB_WORKSPACE":"$GITHUB_WORKSPACE" \
             -w "$GITHUB_WORKSPACE" \
+            -e DESKTOP_ENVIRONMENT="$DESKTOP_ENVIRONMENT" -e EXTRA_PACKAGES="$EXTRA_PACKAGES" \
             --user root \
             "fedora:${FEDORA_RELEASE}" \
             bash -euxo pipefail -c '
+              read -r -a desktop_packages <<< "$DESKTOP_ENVIRONMENT"
+              read -r -a extra_packages <<< "$EXTRA_PACKAGES"
               echo "%_install_langs all" > /etc/rpm/macros.image-language-conf
               sed -i "/tsflags=nodocs/d" /etc/dnf/dnf.conf
 
@@ -206,12 +215,12 @@ jobs:
               dnf -y --installroot="'"$ROOTFS_DIR"'" --releasever="'"$FEDORA_RELEASE"'" --forcearch=aarch64 --use-host-config \
                 --exclude="'"$EXCLUDED_PACKAGES"'" \
                 install \
-                @core @standard "'"$DESKTOP_ENVIRONMENT"'" \
+                @core @standard "${desktop_packages[@]}" \
                 systemd-boot-unsigned alsa-ucm \
                 langpacks-en langpacks-zh_CN \
                 google-noto-color-emoji-fonts google-noto-emoji-fonts \
                 alsa-utils pipewire-utils \
-                '"$EXTRA_PACKAGES"'
+                "${extra_packages[@]}"
 
               dnf -y --installroot="'"$ROOTFS_DIR"'" --releasever="'"$FEDORA_RELEASE"'" --forcearch=aarch64 --use-host-config \
                 install \

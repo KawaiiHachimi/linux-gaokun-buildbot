@@ -1,3 +1,5 @@
+> Historical guide: patch paths and kernel build steps below describe the pre-migration tree. See the [migration record](migration.md) for current entry points and blockers. EL2 builds are paused.
+
 English | [中文](el2_kvm_guide_zh.md)
 
 # Huawei MateBook E Go 2023 EL2 Implementation Notes

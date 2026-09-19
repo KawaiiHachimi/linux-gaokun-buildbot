@@ -3,10 +3,6 @@ name: Build Package - RPMs Gaokun3
 on:
   workflow_dispatch:
     inputs:
-      kernel_tag:
-        description: Linux kernel tag
-        required: true
-        default: "v7.2-rc2"
       build_el2:
         description: Build extra -gaokun3-el2 kernel packages
         required: true
@@ -14,10 +10,6 @@ on:
         type: boolean
   workflow_call:
     inputs:
-      kernel_tag:
-        description: Linux kernel tag
-        required: true
-        type: string
       build_el2:
         description: Build extra -gaokun3-el2 kernel packages
         required: false
@@ -38,14 +30,13 @@ jobs:
     runs-on: ubuntu-24.04-arm
     env:
       TZ: UTC
-      KERNEL_TAG: ${{ inputs.kernel_tag || github.event.inputs.kernel_tag }}
       BUILD_EL2: ${{ inputs.build_el2 || github.event.inputs.build_el2 || 'false' }}
       GAOKUN_DIR: ${{ github.workspace }}
       WORKDIR: ${{ github.workspace }}/build-packages
       KERN_SRC: ${{ github.workspace }}/build-packages/mainline-linux
-      KERN_SRC_BASE: ${{ github.workspace }}/build-packages/mainline-linux-base
+      KERN_SRC_BASE: ${{ github.workspace }}/build-packages/mainline-linux
       KERN_OUT: ${{ github.workspace }}/build-packages/kernel-out
-      KERN_SRC_EL2: ${{ github.workspace }}/build-packages/mainline-linux
+      KERN_SRC_EL2: ${{ github.workspace }}/build-packages/linux-el2
       KERN_OUT_EL2: ${{ github.workspace }}/build-packages/kernel-out-el2
       ARTIFACT_DIR: ${{ github.workspace }}/build-packages/artifacts
 
@@ -53,13 +44,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Load reviewed build inputs
+        run: |
+          set -euo pipefail
+          . ./build.env
+          echo "BUILDBOT_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          if [[ "$BUILD_EL2" == true && -z "$KERNEL_EL2_COMMIT" ]]; then
+            echo 'EL2 migration is not ready: KERNEL_EL2_COMMIT is unset.' >&2
+            exit 1
+          fi
+          for name in KERNEL_REPOSITORY KERNEL_TAG KERNEL_COMMIT KERNEL_EL2_COMMIT FEDORA_RELEASE UBUNTU_RELEASE; do
+            printf '%s=%s\n' "$name" "${!name}" >> "$GITHUB_ENV"
+          done
+
       - name: Checkout Linux source
         uses: actions/checkout@v6
         with:
-          repository: torvalds/linux
-          ref: ${{ env.KERNEL_TAG }}
+          repository: ${{ env.KERNEL_REPOSITORY }}
+          ref: ${{ env.KERNEL_COMMIT }}
           fetch-depth: 1
           path: build-packages/mainline-linux
+
+      - name: Checkout EL2 Linux source
+        if: env.BUILD_EL2 == 'true'
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.KERNEL_REPOSITORY }}
+          ref: ${{ env.KERNEL_EL2_COMMIT }}
+          fetch-depth: 1
+          path: build-packages/linux-el2
 
       - name: Install host dependencies
         run: |
@@ -88,9 +101,9 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.ccache
-          key: gaokun3-packages-rpm-ccache-${{ env.KERNEL_TAG }}-${{ env.BUILD_EL2 }}-${{ hashFiles('patches/*.patch', 'patches/el2/*.patch', 'defconfig/**', 'dts/**', 'drivers/**', 'packaging/**', 'firmware/**', 'scripts/ci/*.sh', '.github/workflows/gaokun3-package-rpms.yml') }}
+          key: gaokun3-packages-rpm-ccache-${{ env.KERNEL_COMMIT }}-${{ env.BUILD_EL2 }}-${{ hashFiles('build.env', 'packaging/**', 'firmware/**', 'scripts/ci/*.sh', '.github/workflows/gaokun3-package-rpms.yml') }}
           restore-keys: |
-            gaokun3-packages-rpm-ccache-${{ env.KERNEL_TAG }}-
+            gaokun3-packages-rpm-ccache-${{ env.KERNEL_COMMIT }}-
             gaokun3-packages-rpm-ccache-
 
       - name: Build gaokun kernel variants
@@ -114,12 +127,14 @@ jobs:
             -e KERN_OUT_EL2="$KERN_OUT_EL2" \
             -e ARTIFACT_DIR="$ARTIFACT_DIR" \
             -e KERNEL_TAG="$KERNEL_TAG" \
+            -e KERNEL_COMMIT="$KERNEL_COMMIT" \
+            -e BUILDBOT_COMMIT="$BUILDBOT_COMMIT" \
             -e PACKAGE_RELEASE_TAG="$PACKAGE_RELEASE_TAG" \
             -e BUILD_EL2="$BUILD_EL2" \
             --user root \
-            "fedora:44" \
+            "fedora:${FEDORA_RELEASE}" \
             bash -euxo pipefail -c '
-              dnf -y install gcc make rpm-build kmod elfutils-libelf-devel tar gzip rsync
+              dnf -y install git gcc make rpm-build kmod elfutils-libelf-devel tar gzip rsync
               chmod +x scripts/ci/70_build_package_rpms.sh
               scripts/ci/70_build_package_rpms.sh
             '

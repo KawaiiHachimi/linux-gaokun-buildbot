@@ -157,6 +157,9 @@ cat > /etc/kernel/install.conf <<'EOF'
 layout=bls
 EOF
 
+# Persist the same short token for later package and initramfs hooks.
+printf '%s\n' 'ubuntu' > /etc/kernel/entry-token
+
 cat > /etc/kernel/cmdline <<EOF
 root=UUID=$ROOT_UUID clk_ignore_unused pd_ignore_unused arm64.nopauth iommu.passthrough=0 iommu.strict=0 pcie_aspm.policy=powersupersave modprobe.blacklist=simpledrm efi=noruntime fbcon=rotate:1 usbhid.quirks=0x12d1:0x10b8:0x20000000 consoleblank=0 loglevel=4 psi=1
 EOF
@@ -180,7 +183,6 @@ fi
 
 rm -f /etc/machine-id
 systemd-machine-id-setup
-MACHINE_ID="$(cat /etc/machine-id)"
 
 bootctl --no-variables --esp-path=/boot/efi install
 
@@ -199,9 +201,9 @@ EOF
   printf '%s\n' "$cmdline" > "$conf_root/cmdline"
   printf 'qcom/%s\n' "$dtb" > "$conf_root/devicetree"
 
-  kernel-install --entry-token=machine-id remove "$krel" || true
+  kernel-install --entry-token=os-id remove "$krel" || true
   KERNEL_INSTALL_CONF_ROOT="$conf_root" \
-    kernel-install --verbose --make-entry-directory=yes --entry-token=machine-id add \
+    kernel-install --verbose --make-entry-directory=yes --entry-token=os-id add \
     "$krel" "$image" "$initrd"
   rm -rf "$conf_root"
 }
@@ -225,7 +227,7 @@ if [[ "$BUILD_EL2" == "true" && -n "$KREL_EL2" ]]; then
 fi
 
 cat > /boot/efi/loader/loader.conf <<EOF
-default ${MACHINE_ID}-${KREL}.conf
+default ubuntu-${KREL}.conf
 timeout 5
 console-mode keep
 editor no
